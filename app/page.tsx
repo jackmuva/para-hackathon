@@ -1,9 +1,13 @@
-export default function Home() {
+import {getSession} from "@/app/components/ui/integration/auth-action";
+import Login from "@/app/components/ui/integration/login";
+
+export default async function Home() {
+    let session = await getSession();
+
     return (
         <main className="pt-10 flex justify-center items-center background-gradient">
-            <div className="flex-col space-y-2 lg:space-y-10 w-[90%] lg:w-[60rem]">
-
-            </div>
+            {!session && <Login></Login>}
+            {session && <div>You're logged in!</div>}
         </main>
     );
 }
