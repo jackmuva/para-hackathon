@@ -6,8 +6,8 @@ import ToastProvider from "@/app/components/ui/toast/toast-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Parato Demo",
-  description: "Built with Paragon and LlamaIndex",
+  title: "Para-hack",
+  description: "Building in-house integrations",
 };
 
 export default function RootLayout({
