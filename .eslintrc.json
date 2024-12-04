@@ -1,0 +1,13 @@
+{
+  "extends": ["next/core-web-vitals", "prettier"],
+  "rules": {
+    "max-params": ["error", 4],
+//    "prefer-const": "error",
+    "react-hooks/exhaustive-deps": "off",
+    "@next/next/no-img-element": "off",
+    "turbo/no-undeclared-env-vars": "off",
+    "prefer-const": "off",
+    "jsx-ally/alt-text": "off",
+    "react/no-unescaped-entities": "off"
+  }
+}
