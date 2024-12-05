@@ -8,11 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate": "tsx app/api/chat/engine/generate.ts",
-    "build:worker": "cloudflare",
-    "dev:worker": "wrangler dev --port 8771",
-    "preview:worker": "npm run build:worker && npm run dev:worker",
-    "deploy:worker": "npm run build:worker && wrangler deploy"
+    "sqlite-setup": "node sqlite/startup.js"
   },
   "dependencies": {
     "@apidevtools/swagger-parser": "^10.1.0",
@@ -47,6 +43,7 @@
     "remark-code-import": "^1.2.0",
     "remark-gfm": "^3.0.1",
     "remark-math": "^5.1.1",
+    "sqlite3": "^5.1.7",
     "supports-color": "^8.1.1",
     "tailwind-merge": "^2.1.0",
     "tiktoken": "^1.0.15",
