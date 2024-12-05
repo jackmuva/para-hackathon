@@ -1,16 +1,20 @@
 "use client";
 import Image from "next/image";
 import React from "react";
+import {getBackendOrigin} from "@/app/utlities/util";
 
 const Integrations = () => {
     const initiateDriveOauth = () => {
         const params = new URLSearchParams({
             client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "",
-            redirect_uri: "http://localhost:3000/oauth/googledrive",
-            response_type: 'token',
-            scope: 'https://www.googleapis.com/auth/drive.metadata.readonly',
+            redirect_uri: getBackendOrigin() + "/oauth/googledrive",
+            response_type: 'code',
+            scope: 'https://www.googleapis.com/auth/drive.file',
             include_granted_scopes: 'true',
-            state: 'pass-through value'}).toString();
+            state: 'pass-through value',
+            access_type: "offline",
+            prompt: "consent"
+        }).toString();
 
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
