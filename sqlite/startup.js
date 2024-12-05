@@ -1,10 +1,10 @@
 import sqlite3 from "sqlite3";
 
-const db = new sqlite3.Database("./sqllite/credentials_db.db");
+const db = new sqlite3.Database("credentials_db.db");
 
 db.exec(`
     CREATE TABLE IF NOT EXISTS credentials (
-        id INTEGER PRIMARY KEY,
+        id TEXT PRIMARY KEY,
         email TEXT NOT NULL,
         access_token TEXT,
         refresh_token TEXT,
