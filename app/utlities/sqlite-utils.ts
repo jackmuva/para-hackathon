@@ -10,7 +10,7 @@ export type Credential = {
 }
 
 export async function insertCredential(credential: Credential){
-    const db = new sqlite3.Database("./credentials_db.db", sqlite3.OPEN_READWRITE);
+    const db = new sqlite3.Database("./drive_credentials.db", sqlite3.OPEN_READWRITE);
     const sql = 'INSERT INTO credentials (id, email, access_token, refresh_token, access_token_expiration) VALUES (?,?,?,?,?)';
     try {
         await insertUpdate(db, sql, [credential.id, credential.email, credential.access_token, credential.refresh_token, credential.access_token_expiration]);
@@ -22,7 +22,7 @@ export async function insertCredential(credential: Credential){
 }
 
 export async function getByEmail(email: string){
-    const db = new sqlite3.Database("./credentials_db.db", sqlite3.OPEN_READWRITE);
+    const db = new sqlite3.Database("./drive_credentials.db", sqlite3.OPEN_READWRITE);
     const sql = `SELECT * FROM credentials WHERE email = '${email}'`;
     let records = [];
     try {
@@ -36,7 +36,7 @@ export async function getByEmail(email: string){
 }
 
 export async function getAll(){
-    const db = new sqlite3.Database("./credentials_db.db", sqlite3.OPEN_READWRITE);
+    const db = new sqlite3.Database("./drive_credentials.db", sqlite3.OPEN_READWRITE);
     const sql = `SELECT * FROM credentials`;
     let records = [];
     try {
@@ -50,7 +50,7 @@ export async function getAll(){
 }
 
 export const updateCredential = async (credential: Credential) => {
-    const db = new sqlite3.Database("./credentials_db.db");
+    const db = new sqlite3.Database("./drive_credentials.db");
     const sql = 'UPDATE credentials SET id = ?, email = ?, access_token = ?, refresh_token = ?, access_token_expiration = ? WHERE email = ?'
     try {
         await insertUpdate(db, sql, [credential.id, credential.email, credential.access_token, credential.refresh_token, credential.access_token_expiration, credential.email]);

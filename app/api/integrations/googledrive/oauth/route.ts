@@ -26,7 +26,6 @@ export async function POST(request: NextRequest) {
         }).then((res) => {
             res.json().then((body) => {
                 body.email = response.email;
-                console.log(body);
                 loadCredentials(body);
                 return NextResponse.json(
                     { status: 200 }

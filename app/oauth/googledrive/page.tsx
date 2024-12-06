@@ -20,7 +20,7 @@ export default function DriveAuth(){
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
 
-        fetch(getBackendOrigin() + "/api/integrations/googledrive", {
+        fetch(getBackendOrigin() + "/api/integrations/googledrive/oauth", {
             method: "POST",
             body: JSON.stringify(params),
             headers: headers
@@ -30,6 +30,6 @@ export default function DriveAuth(){
             toast.error(error);
         });
 
-        window.location.href = "http://localhost:3000";
+        window.location.href = getBackendOrigin();
     });
 };
