@@ -49,7 +49,22 @@ const Integrations = () => {
     };
 
     const openDrivePanel = () => {
-        console.log("drive!")
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+
+        getSession().then((session) => {
+            console.log(session?.user?.email);
+            fetch(getBackendOrigin() + "/api/integrations/googledrive/list-files", {
+                method: "POST",
+                body: JSON.stringify({email: session?.user?.email}),
+                headers: headers
+            }).then((res) => {
+                console.log(res);
+                res.json().then((body) => {
+                    console.log(body);
+                })
+            })
+        })
     }
 
     return (
