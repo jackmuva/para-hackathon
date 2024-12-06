@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import {Credential, getByEmail, insertCredential, updateCredential} from "@/app/utlities/sqlite-utils";
-import {uuidv4} from "uuidv7";
+import {loadCredentials} from "@/app/api/integrations/googledrive";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -53,42 +52,4 @@ export async function POST(request: NextRequest) {
         { error: "something went wrong" },
         { status: 500 },
     );
-}
-
-type googleResponse = {
-    access_token: string,
-    expires_in: number,
-    refresh_token: string,
-    scope: string,
-    token_type: string,
-    email: string
-}
-
-function loadCredentials(body: googleResponse) {
-    if(!body.access_token){
-        return;
-    }
-
-    let now = new Date();
-    const credential: Credential = {
-        id: uuidv4(),
-        email: body.email,
-        access_token: body.access_token,
-        refresh_token: body.refresh_token,
-        access_token_expiration: now.setSeconds(now.getSeconds() + body.expires_in).toString()
-    };
-    getByEmail(credential.email).then((rec) => {
-        console.log(credential);
-        if(rec.length === 0){
-            console.log("creating");
-            insertCredential(credential).then(() => {
-                console.log("Credential created for: " + credential.email);
-            });
-        } else{
-            console.log("updating")
-            updateCredential(credential).then(() => {
-                console.log("Credential updated for: " + credential.email);
-            })
-        }
-    });
 }

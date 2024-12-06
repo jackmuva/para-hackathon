@@ -22,6 +22,7 @@ const Integrations = () => {
                 body: JSON.stringify({email: session?.user?.email}),
                 headers: headers
             }).then((res) => {
+                console.log(res);
                 res.json().then((body) => {
                     console.log(body);
                     setIntegrations(body);
@@ -85,7 +86,11 @@ const Integrations = () => {
                       priority
                   />
                   { !integrations.hasCreds.drive && <div>Integrate with Google Drive</div> }
-                  { integrations.hasCreds.drive && <div>Google Drive is Integrated!</div> }
+                  { integrations.hasCreds.drive &&
+                      <div className={"flex flex-col"}>
+                          <div>Google Drive is Integrated!</div>
+                          <div className={"text-xs"}>(Click to trigger a backend API)</div>
+                     </div> }
               </button>
           </div>
       </div>

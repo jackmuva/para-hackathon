@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getByEmail } from "@/app/utlities/sqlite-utils";
+import {refreshDriveAccessToken} from "@/app/api/integrations/googledrive";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -7,9 +8,11 @@ export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest) {
     const response = await request.json();
     let files = {};
-
-    try {
-        const driveCreds = await getByEmail(response.email);
+    getByEmail(response.email).then((driveCreds) => {
+        if (driveCreds[0] && new Date(Number(driveCreds[0].access_token_expiration)) < new Date()) {
+            console.log("need refresh");
+            refreshDriveAccessToken(driveCreds[0], response.email);
+        }
 
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
@@ -23,16 +26,32 @@ export async function POST(request: NextRequest) {
                 console.log(body);
                 files = body;
                 return NextResponse.json(
-                    { files: files },
-                    { status: 500 },
+                    {files: files},
+                    {status: 200},
                 );
-            })
-        })
-    } catch (error) {
+            }).catch((error) => {
+                console.error("[Google Drive list files API]", error);
+                return NextResponse.json(
+                    {error: (error as Error).message},
+                    {status: 500},
+                );
+            });
+        }).catch((error) => {
+            console.error("[Google Drive list files API]", error);
+            return NextResponse.json(
+                {error: (error as Error).message},
+                {status: 500},
+            );
+        });
+    }).catch((error) => {
         console.error("[Google Drive list files API]", error);
         return NextResponse.json(
-            { error: (error as Error).message },
-            { status: 500 },
+            {error: (error as Error).message},
+            {status: 500},
         );
-    }
+    });
+    return NextResponse.json(
+        {files: files},
+        {status: 200},
+    );
 }
