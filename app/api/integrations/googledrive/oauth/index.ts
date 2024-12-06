@@ -1,7 +1,11 @@
-import {Credential, getByEmail, insertCredential, updateCredential} from "@/app/utlities/sqlite-utils";
+import {
+    getDriveCredentialByEmail,
+    insertDriveCredential,
+    updateDriveCredential
+} from "@/app/utlities/drive-sqlite-utils";
 import {uuidv4} from "uuidv7";
 
-type DriveCredential = {
+type Credential = {
     id: string,
     email: string,
     access_token: string,
@@ -11,7 +15,7 @@ type DriveCredential = {
 }
 
 
-export const refreshDriveAccessToken = (cred: DriveCredential, email: string) => {
+export const refreshDriveAccessToken = (cred: Credential, email: string) => {
     const params = {
         client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
@@ -30,7 +34,7 @@ export const refreshDriveAccessToken = (cred: DriveCredential, email: string) =>
             cred.access_token = body.access_token;
             cred.expires_in = body.expires_in;
             cred.email = email;
-            loadCredentials(cred);
+            loadDriveCredentials(cred);
         })
     })
 }
@@ -46,7 +50,7 @@ export type googleResponse = {
     access_token_expiration?: string
 }
 
-export function loadCredentials(body: googleResponse) {
+export function loadDriveCredentials(body: googleResponse) {
     if(!body.access_token){
         return;
     }
@@ -59,15 +63,15 @@ export function loadCredentials(body: googleResponse) {
         refresh_token: body.refresh_token,
         access_token_expiration: now.setSeconds(now.getSeconds() + (body.expires_in ?? 3600)).toString()
     };
-    getByEmail(credential.email).then((rec) => {
+    getDriveCredentialByEmail(credential.email).then((rec) => {
         if(rec.length === 0){
             console.log("creating");
-            insertCredential(credential).then(() => {
+            insertDriveCredential(credential).then(() => {
                 console.log("Credential created for: " + credential.email);
             });
         } else{
             console.log("updating")
-            updateCredential(credential).then(() => {
+            updateDriveCredential(credential).then(() => {
                 console.log("Credential updated for: " + credential.email);
             })
         }

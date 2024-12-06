@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import {loadDriveCredentials} from "@/app/api/integrations/googledrive/oauth";
 import {getBackendOrigin} from "@/app/utlities/util";
+import {loadSlackCredentials} from "@/app/api/integrations/slack/oauth/index";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -9,25 +9,25 @@ export async function POST(request: NextRequest) {
     const response = await request.json();
     try {
         const headers = new Headers();
-        headers.append("Content-Type", "application/json");
+        headers.append("Content-Type", "application/x-www-form-urlencoded");
 
         const params = {
             code: response.code,
-            client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-            client_secret: process.env.GOOGLE_CLIENT_SECRET,
-            redirect_uri: getBackendOrigin() + "/oauth/googledrive",
-            grant_type: "authorization_code"
+            client_id: process.env.NEXT_PUBLIC_SLACK_CLIENT_ID ?? "",
+            client_secret: process.env.SLACK_CLIENT_SECRET ?? "",
+            grant_type: "authorization_code",
         }
-        console.log(params);
 
-        fetch("https://oauth2.googleapis.com/token", {
+        fetch("https://slack.com/api/oauth.v2.access", {
             method: "POST",
-            body: JSON.stringify(params),
+            body: new URLSearchParams(params),
             headers: headers
         }).then((res) => {
             res.json().then((body) => {
                 body.email = response.email;
-                loadDriveCredentials(body);
+                body.incoming_webhook_url = body.incoming_webhook.url;
+                console.log(body);
+                loadSlackCredentials(body);
                 return NextResponse.json(
                     { status: 200 }
                 );

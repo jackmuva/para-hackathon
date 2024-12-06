@@ -43,8 +43,8 @@ function DriveButton({enabled}: {enabled: boolean}){
     }
 
     return (
-        <button className={!enabled ? "p-2 px-4 text-center flex bg-gray-200 shadow-2xl rounded-2xl items-center space-x-2 font-['Helvetica']" :
-            "p-2 px-4 text-center flex bg-green-200 shadow-2xl rounded-2xl items-center space-x-2 font-['Helvetica']"}
+        <button className={!enabled ? "p-2 px-4 text-center flex bg-gray-200 shadow-2xl rounded-2xl items-center space-x-2 font-['Helvetica'] min-w-full" :
+            "p-2 px-4 text-center flex bg-green-200 shadow-2xl rounded-2xl items-center space-x-2 font-['Helvetica'] min-w-full"}
                 onClick={!enabled ? initiateDriveOauth : openDrivePanel}>
             <Image
                 className="rounded-xl"

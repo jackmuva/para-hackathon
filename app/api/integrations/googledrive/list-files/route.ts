@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getByEmail } from "@/app/utlities/sqlite-utils";
-import {refreshDriveAccessToken} from "@/app/api/integrations/googledrive";
+import {refreshDriveAccessToken} from "@/app/api/integrations/googledrive/oauth";
+import {getDriveCredentialByEmail} from "@/app/utlities/drive-sqlite-utils";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest) {
     const response = await request.json();
     let files = {};
-    getByEmail(response.email).then((driveCreds) => {
+    getDriveCredentialByEmail(response.email).then((driveCreds) => {
         if (driveCreds[0] && new Date(Number(driveCreds[0].access_token_expiration)) < new Date()) {
             console.log("need refresh");
             refreshDriveAccessToken(driveCreds[0], response.email);

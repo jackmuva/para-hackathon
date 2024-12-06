@@ -1,7 +1,7 @@
 import sqlite3 from "sqlite3";
 import {fetchAll, fetchFirst, insertUpdate} from "@/app/utlities/sql";
 
-export type Credential = {
+export type DriveCredential = {
     id: string,
     email: string,
     access_token: string,
@@ -9,9 +9,9 @@ export type Credential = {
     access_token_expiration: string
 }
 
-export async function insertCredential(credential: Credential){
-    const db = new sqlite3.Database("./drive_credentials.db", sqlite3.OPEN_READWRITE);
-    const sql = 'INSERT INTO credentials (id, email, access_token, refresh_token, access_token_expiration) VALUES (?,?,?,?,?)';
+export async function insertDriveCredential(credential: DriveCredential){
+    const db = new sqlite3.Database("./credentials.db", sqlite3.OPEN_READWRITE);
+    const sql = 'INSERT INTO drive_credentials (id, email, access_token, refresh_token, access_token_expiration) VALUES (?,?,?,?,?)';
     try {
         await insertUpdate(db, sql, [credential.id, credential.email, credential.access_token, credential.refresh_token, credential.access_token_expiration]);
     } catch (err) {
@@ -21,9 +21,9 @@ export async function insertCredential(credential: Credential){
     }
 }
 
-export async function getByEmail(email: string){
-    const db = new sqlite3.Database("./drive_credentials.db", sqlite3.OPEN_READWRITE);
-    const sql = `SELECT * FROM credentials WHERE email = '${email}'`;
+export async function getDriveCredentialByEmail(email: string){
+    const db = new sqlite3.Database("./credentials.db", sqlite3.OPEN_READWRITE);
+    const sql = `SELECT * FROM drive_credentials WHERE email = '${email}'`;
     let records = [];
     try {
         records = await fetchAll(db, sql);
@@ -35,9 +35,9 @@ export async function getByEmail(email: string){
     }
 }
 
-export async function getAll(){
-    const db = new sqlite3.Database("./drive_credentials.db", sqlite3.OPEN_READWRITE);
-    const sql = `SELECT * FROM credentials`;
+export async function getAllDriveCredentials(){
+    const db = new sqlite3.Database("./credentials.db", sqlite3.OPEN_READWRITE);
+    const sql = `SELECT * FROM drive_credentials`;
     let records = [];
     try {
         records = await fetchAll(db, sql);
@@ -49,9 +49,9 @@ export async function getAll(){
     }
 }
 
-export const updateCredential = async (credential: Credential) => {
-    const db = new sqlite3.Database("./drive_credentials.db");
-    const sql = 'UPDATE credentials SET id = ?, email = ?, access_token = ?, refresh_token = ?, access_token_expiration = ? WHERE email = ?'
+export const updateDriveCredential = async (credential: DriveCredential) => {
+    const db = new sqlite3.Database("./credentials.db");
+    const sql = 'UPDATE drive_credentials SET id = ?, email = ?, access_token = ?, refresh_token = ?, access_token_expiration = ? WHERE email = ?'
     try {
         await insertUpdate(db, sql, [credential.id, credential.email, credential.access_token, credential.refresh_token, credential.access_token_expiration, credential.email]);
     } catch (err) {
