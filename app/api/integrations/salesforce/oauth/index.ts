@@ -3,11 +3,10 @@ import {
     insertSalesforceCredential,
     updateSalesforceCredential
 } from "@/app/utlities/salesforce-sqlite-utils";
-import {getBackendOrigin} from "@/app/utlities/util";
 
-export const refreshSalesforceToken = async(credential: SalesforceCredential) => {
+export const refreshSalesforceToken = async(credential: SalesforceCredential): Promise<boolean> => {
     const headers = new Headers();
-    headers.append("Content-Type", "application/json");
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
 
     const params = {
         refresh_token: credential.refresh_token,
@@ -16,14 +15,22 @@ export const refreshSalesforceToken = async(credential: SalesforceCredential) =>
         grant_type: "refresh_token"
     }
 
-    console.log(params);
     const response = await fetch("https://login.salesforce.com/services/oauth2/token",{
         method: "POST",
-        body: JSON.stringify(params),
+        body: new URLSearchParams(params),
         headers: headers
     });
+    let body = await response.json();
 
     console.log(response);
+    if(response.status === 200){
+        body = {...body, email: credential.email, refresh_token: credential.refresh_token};
+        const res: any = await loadSalesforceCredentials(body);
+        if(res) return true;
+    } else{
+        console.log("[Salesforce Token Refresh]" + body);
+    }
+    return false;
 }
 
 export const loadSalesforceCredentials = async(credentials: SalesforceCredential) => {
@@ -38,7 +45,7 @@ export const loadSalesforceCredentials = async(credentials: SalesforceCredential
         res = await updateSalesforceCredential(credentials);
     }
     console.log(res);
-    return;
+    return res;
 }
 
 export type SalesforceCredential = {
