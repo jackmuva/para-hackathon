@@ -1,5 +1,5 @@
 import {NextRequest, NextResponse} from "next/server";
-import {getAllSlackCredentials, getSlackCredentialByEmail} from "@/app/utlities/slack-sqlite-utils";
+import {getSlackCredentialByEmail} from "@/app/utlities/slack-sqlite-utils";
 
 export async function POST(request: NextRequest) {
     const response = await request.json();
@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
 
-        const slackCreds = await getAllSlackCredentials();
+        const slackCreds = await getSlackCredentialByEmail(response.email);
 
         const params = {
             text: response.text

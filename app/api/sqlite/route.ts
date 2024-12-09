@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import {getAllDriveCredentials} from "@/app/utlities/drive-sqlite-utils";
 import {getAllSlackCredentials} from "@/app/utlities/slack-sqlite-utils";
+import {getAllSalesforceCredentials} from "@/app/utlities/salesforce-sqlite-utils";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
     try {
-        console.log(await getAllSlackCredentials());
+        console.log(await getAllSalesforceCredentials());
         return NextResponse.json(
             { status: 200 },
         );

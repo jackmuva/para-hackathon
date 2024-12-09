@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {loadSlackCredentials} from "@/app/api/integrations/slack/oauth/index";
+import {getBackendOrigin} from "@/app/utlities/util";
+import {loadSalesforceCredentials} from "@/app/api/integrations/salesforce/oauth/index";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,21 +14,21 @@ export async function POST(request: NextRequest) {
 
         const params = {
             code: response.code,
-            client_id: process.env.NEXT_PUBLIC_SLACK_CLIENT_ID ?? "",
-            client_secret: process.env.SLACK_CLIENT_SECRET ?? "",
+            client_id: process.env.NEXT_PUBLIC_SALESFORCE_CLIENT_ID ?? "",
+            client_secret: process.env.SALESFORCE_CLIENT_SECRET ?? "",
             grant_type: "authorization_code",
+            redirect_uri: getBackendOrigin() + "/oauth/salesforce"
         }
 
-        fetch("https://slack.com/api/oauth.v2.access", {
+        fetch("https://useparagon2-dev-ed.develop.my.salesforce.com/services/oauth2/token", {
             method: "POST",
             body: new URLSearchParams(params),
             headers: headers
         }).then((res) => {
             res.json().then((body) => {
                 body.email = response.email;
-                body.incoming_webhook_url = body.incoming_webhook.url;
                 console.log(body);
-                loadSlackCredentials(body);
+                loadSalesforceCredentials(body);
                 return NextResponse.json(
                     { status: 200 }
                 );
@@ -43,7 +45,7 @@ export async function POST(request: NextRequest) {
             );
         });
     } catch (error) {
-        console.error("[Google Drive Oauth API]", error);
+        console.error("[Salesforce OAuth API]", error);
         return NextResponse.json(
             { error: (error as Error).message },
             { status: 500 },

@@ -18,9 +18,6 @@ function DriveButton({enabled}: {enabled: boolean}){
             prompt: "consent"
         }).toString();
 
-        const headers = new Headers();
-        headers.append("Content-Type", "application/json");
-
         window.location.href = "https://accounts.google.com/o/oauth2/v2/auth?" + params;
     };
 

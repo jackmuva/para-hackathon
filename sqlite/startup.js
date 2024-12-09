@@ -21,4 +21,14 @@ db.exec(`
     );
 `);
 
+db.exec(`
+    CREATE TABLE IF NOT EXISTS salesforce_credentials (
+        id TEXT PRIMARY KEY,
+        email TEXT NOT NULL,
+        access_token TEXT,
+        refresh_token TEXT,
+        instance_url TEXT
+    );
+`);
+
 db.close();
