@@ -21,7 +21,7 @@ export async function insertDriveCredential(credential: DriveCredential){
     }
 }
 
-export async function getDriveCredentialByEmail(email: string){
+export async function getDriveCredentialByEmail(email: string): Promise<Array<DriveCredential>>{
     const db = new sqlite3.Database("./credentials.db", sqlite3.OPEN_READWRITE);
     const sql = `SELECT * FROM drive_credentials WHERE email = '${email}'`;
     let records = [];
@@ -35,7 +35,7 @@ export async function getDriveCredentialByEmail(email: string){
     }
 }
 
-export async function getAllDriveCredentials(){
+export async function getAllDriveCredentials(): Promise<Array<DriveCredential>>{
     const db = new sqlite3.Database("./credentials.db", sqlite3.OPEN_READWRITE);
     const sql = `SELECT * FROM drive_credentials`;
     let records = [];

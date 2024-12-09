@@ -7,8 +7,8 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
     const response = await request.json();
-    let files = {};
-    getDriveCredentialByEmail(response.email).then((driveCreds) => {
+    try{
+        const driveCreds = await getDriveCredentialByEmail(response.email);
         if (driveCreds[0] && new Date(Number(driveCreds[0].access_token_expiration)) < new Date()) {
             console.log("need refresh");
             refreshDriveAccessToken(driveCreds[0], response.email);
@@ -18,40 +18,32 @@ export async function POST(request: NextRequest) {
         headers.append("Content-Type", "application/json");
         headers.append("Authorization", "Bearer " + driveCreds[0].access_token);
 
-        fetch("https://www.googleapis.com/drive/v3/files", {
+        const googleResponse = await fetch("https://www.googleapis.com/drive/v3/files", {
             method: "GET",
             headers: headers
-        }).then((response) => {
-            response.json().then((body) => {
-                console.log(body);
-                files = body;
-                return NextResponse.json(
-                    {files: files},
-                    {status: 200},
-                );
-            }).catch((error) => {
-                console.error("[Google Drive list files API]", error);
-                return NextResponse.json(
-                    {error: (error as Error).message},
-                    {status: 500},
-                );
-            });
-        }).catch((error) => {
-            console.error("[Google Drive list files API]", error);
+        })
+
+        const body = await googleResponse.json()
+        console.log(body);
+
+        if(googleResponse.status === 200) {
             return NextResponse.json(
-                {error: (error as Error).message},
+                {files: body},
+                {status: 200},
+            );
+        } else {
+            console.error("[Google Drive list files API]", body);
+            return NextResponse.json(
+                {error: (body as Error).message},
                 {status: 500},
             );
-        });
-    }).catch((error) => {
+        }
+
+    }catch(error) {
         console.error("[Google Drive list files API]", error);
         return NextResponse.json(
             {error: (error as Error).message},
             {status: 500},
         );
-    });
-    return NextResponse.json(
-        {files: files},
-        {status: 200},
-    );
+    }
 }
