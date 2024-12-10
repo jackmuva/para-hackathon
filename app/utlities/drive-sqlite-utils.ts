@@ -1,5 +1,8 @@
 import sqlite3 from "sqlite3";
 import {fetchAll, fetchFirst, insertUpdate} from "@/app/utlities/sql";
+import {Encrypter} from "@/app/utlities/util";
+
+const encrypter = new Encrypter();
 
 export type DriveCredential = {
     id: string,
@@ -13,7 +16,7 @@ export async function insertDriveCredential(credential: DriveCredential){
     const db = new sqlite3.Database("./credentials.db", sqlite3.OPEN_READWRITE);
     const sql = 'INSERT INTO drive_credentials (id, email, access_token, refresh_token, access_token_expiration) VALUES (?,?,?,?,?)';
     try {
-        await insertUpdate(db, sql, [credential.id, credential.email, credential.access_token, credential.refresh_token, credential.access_token_expiration]);
+        await insertUpdate(db, sql, [credential.id, credential.email, encrypter.encrypt(credential.access_token), encrypter.encrypt(credential.refresh_token), credential.access_token_expiration]);
     } catch (err) {
         console.log(err);
     } finally {
@@ -27,6 +30,10 @@ export async function getDriveCredentialByEmail(email: string): Promise<Array<Dr
     let records = [];
     try {
         records = await fetchAll(db, sql);
+        records.forEach((record: any) => {
+            record.access_token = encrypter.decrypt(record.access_token);
+            record.refresh_token = encrypter.decrypt(record.refresh_token);
+        });
     } catch (err) {
         console.log(err);
     } finally {
@@ -41,6 +48,10 @@ export async function getAllDriveCredentials(): Promise<Array<DriveCredential>>{
     let records = [];
     try {
         records = await fetchAll(db, sql);
+        records.forEach((record: any) => {
+            record.access_token = encrypter.decrypt(record.access_token);
+            record.refresh_token = encrypter.decrypt(record.refresh_token);
+        });
     } catch (err) {
         console.log(err);
     } finally {
@@ -53,7 +64,7 @@ export const updateDriveCredential = async (credential: DriveCredential) => {
     const db = new sqlite3.Database("./credentials.db");
     const sql = 'UPDATE drive_credentials SET id = ?, email = ?, access_token = ?, refresh_token = ?, access_token_expiration = ? WHERE email = ?'
     try {
-        await insertUpdate(db, sql, [credential.id, credential.email, credential.access_token, credential.refresh_token, credential.access_token_expiration, credential.email]);
+        await insertUpdate(db, sql, [credential.id, credential.email, encrypter.encrypt(credential.access_token), encrypter.encrypt(credential.refresh_token), credential.access_token_expiration]);
     } catch (err) {
         console.log(err);
     } finally {

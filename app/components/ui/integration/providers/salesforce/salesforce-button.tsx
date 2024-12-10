@@ -14,7 +14,7 @@ function SalesforceButton({enabled}: {enabled: boolean}){
             response_type: "code"
         }).toString();
 
-        window.location.href = "https://useparagon2-dev-ed.develop.my.salesforce.com/services/oauth2/authorize?" + params;
+        window.location.href = "https://login.salesforce.com/services/oauth2/authorize?" + params;
     }
 
     const triggerSalesforce = async() => {

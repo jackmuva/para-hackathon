@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
             redirect_uri: getBackendOrigin() + "/oauth/salesforce"
         }
 
-        fetch("https://useparagon2-dev-ed.develop.my.salesforce.com/services/oauth2/token", {
+        fetch("https://login.salesforce.com/services/oauth2/token", {
             method: "POST",
             body: new URLSearchParams(params),
             headers: headers
