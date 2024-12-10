@@ -9,6 +9,8 @@ export async function POST(request: NextRequest) {
         let salesforceCreds = await getSalesforceCredentialByEmail(response.email);
         let accountResponse = await getAccounts(salesforceCreds[0]);
 
+        //401 is not always generalizable
+        //the standard error is "invalid_grant"
         if(accountResponse.status === 401){
             console.log("refreshing");
             const refreshed = await refreshSalesforceToken(salesforceCreds[0]);

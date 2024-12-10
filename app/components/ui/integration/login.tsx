@@ -8,7 +8,7 @@ const Login= () => {
   return (
       <div className={"flex space-x-4"}>
           <button onClick={() => SignInWithGoogle()}
-                  className="p-2 px-4 text-center flex bg-gray-200 shadow-2xl rounded-2xl items-center space-x-2 font-['Helvetica']">
+                  className="p-2 px-4 text-center flex bg-gray-200 hover:bg-gray-400 shadow-2xl rounded-2xl items-center space-x-2 font-['Helvetica']">
               <Image
                   className="rounded-xl"
                   src="/google-icon.png"

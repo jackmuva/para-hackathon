@@ -12,6 +12,7 @@ export class Encrypter {
     private algorithm: string;
     private key: Buffer;
 
+    //this is a single point of failure as stands
     constructor() {
         this.algorithm = "aes-192-cbc";
         this.key = crypto.scryptSync(process.env.AUTH_SECRET ?? "secret", "salt", 24);

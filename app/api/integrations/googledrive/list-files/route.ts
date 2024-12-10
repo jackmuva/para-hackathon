@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
         const driveCreds = await getDriveCredentialByEmail(response.email);
         if (driveCreds[0] && new Date(Number(driveCreds[0].access_token_expiration)) < new Date()) {
             console.log("need refresh");
+            //this should be async
             refreshDriveAccessToken(driveCreds[0], response.email);
         }
 
