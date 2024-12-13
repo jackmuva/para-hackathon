@@ -13,14 +13,17 @@ export type DriveCredential = {
 }
 
 export async function insertDriveCredential(credential: DriveCredential){
+    let written = false;
     const db = new sqlite3.Database("./credentials.db", sqlite3.OPEN_READWRITE);
     const sql = 'INSERT INTO drive_credentials (id, email, access_token, refresh_token, access_token_expiration) VALUES (?,?,?,?,?)';
     try {
         await insertUpdate(db, sql, [credential.id, credential.email, encrypter.encrypt(credential.access_token), encrypter.encrypt(credential.refresh_token), credential.access_token_expiration]);
+        written = true;
     } catch (err) {
         console.log(err);
     } finally {
         db.close();
+        return written;
     }
 }
 
@@ -61,13 +64,16 @@ export async function getAllDriveCredentials(): Promise<Array<DriveCredential>>{
 }
 
 export const updateDriveCredential = async (credential: DriveCredential) => {
+    let updated = false;
     const db = new sqlite3.Database("./credentials.db");
     const sql = 'UPDATE drive_credentials SET id = ?, email = ?, access_token = ?, refresh_token = ?, access_token_expiration = ? WHERE email = ?'
     try {
-        await insertUpdate(db, sql, [credential.id, credential.email, encrypter.encrypt(credential.access_token), encrypter.encrypt(credential.refresh_token), credential.access_token_expiration]);
+        const res = await insertUpdate(db, sql, [credential.id, credential.email, encrypter.encrypt(credential.access_token), encrypter.encrypt(credential.refresh_token), credential.access_token_expiration, credential.email]);
+        updated = true || res;
     } catch (err) {
         console.log(err);
     } finally {
         db.close();
+        return updated;
     }
 };

@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
     try {
-        console.log(await getAllSlackCredentials());
+        console.log(await getAllDriveCredentials());
         return NextResponse.json(
             { status: 200 },
         );

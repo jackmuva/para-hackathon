@@ -15,7 +15,8 @@ type Credential = {
 }
 
 
-export const refreshDriveAccessToken = (cred: Credential, email: string) => {
+export const refreshDriveAccessToken = async(cred: Credential, email: string): Promise<boolean> => {
+    let refreshed = false;
     const params = {
         client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
@@ -25,18 +26,17 @@ export const refreshDriveAccessToken = (cred: Credential, email: string) => {
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
 
-    fetch("https://oauth2.googleapis.com/token", {
+    const res = await fetch("https://oauth2.googleapis.com/token", {
         method: "POST",
         body: JSON.stringify(params),
         headers: headers
-    }).then((res) => {
-        res.json().then((body) => {
-            cred.access_token = body.access_token;
-            cred.expires_in = body.expires_in;
-            cred.email = email;
-            loadDriveCredentials(cred);
-        })
     })
+    const body = await res.json();
+    cred.access_token = body.access_token;
+    cred.expires_in = body.expires_in;
+    cred.email = email;
+    refreshed = await loadDriveCredentials(cred);
+    return refreshed;
 }
 
 export type googleResponse = {
@@ -50,10 +50,9 @@ export type googleResponse = {
     access_token_expiration?: string
 }
 
-export function loadDriveCredentials(body: googleResponse) {
-    if(!body.access_token){
-        return;
-    }
+export async function loadDriveCredentials(body: googleResponse): Promise<boolean> {
+    let loaded = false;
+    if(!body.access_token) return loaded;
 
     let now = new Date();
     const credential: Credential = {
@@ -63,17 +62,25 @@ export function loadDriveCredentials(body: googleResponse) {
         refresh_token: body.refresh_token,
         access_token_expiration: now.setSeconds(now.getSeconds() + (body.expires_in ?? 3600)).toString()
     };
-    getDriveCredentialByEmail(credential.email).then((rec) => {
-        if(rec.length === 0){
-            console.log("creating");
-            insertDriveCredential(credential).then(() => {
-                console.log("Credential created for: " + credential.email);
-            });
-        } else{
-            console.log("updating")
-            updateDriveCredential(credential).then(() => {
-                console.log("Credential updated for: " + credential.email);
-            })
-        }
-    });
+    const rec = await getDriveCredentialByEmail(credential.email);
+
+    if(rec.length === 0){
+        console.log("creating");
+        const successful = await insertDriveCredential(credential);
+        if(successful) loaded = true;
+    } else{
+        console.log("updating");
+        const successful = await updateDriveCredential(credential);
+        if(successful) loaded = true;
+    }
+    return loaded;
+}
+export const getLatestDriveCredential = async(email: string) => {
+    let driveCreds = await getDriveCredentialByEmail(email);
+    if (driveCreds[0] && new Date(Number(driveCreds[0].access_token_expiration)) < new Date()) {
+        console.log("need refresh");
+        let refreshed = await refreshDriveAccessToken(driveCreds[0], email);
+        if (refreshed) driveCreds = await getDriveCredentialByEmail(email);
+    }
+    return driveCreds;
 }
