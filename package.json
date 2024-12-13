@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "sqlite-setup": "node sqlite/startup.js"
+    "sqlite-setup": "node dbs/sqlite-startup.js",
+    "pg-setup": "node dbs/pg-startup.js"
   },
   "dependencies": {
     "@apidevtools/swagger-parser": "^10.1.0",
@@ -32,6 +33,7 @@
     "marked": "^14.1.2",
     "next": "^14.2.4",
     "next-auth": "^5.0.0-beta.25",
+    "pg": "^8.13.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^8.0.7",
