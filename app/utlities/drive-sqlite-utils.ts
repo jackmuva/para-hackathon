@@ -1,5 +1,5 @@
 import sqlite3 from "sqlite3";
-import {fetchAll, fetchFirst, insertUpdate} from "@/app/utlities/sql";
+import {fetchAll, fetchFirst, insertUpdate} from "@/app/utlities/sqlite-sql";
 import {Encrypter} from "@/app/utlities/util";
 
 const encrypter = new Encrypter();

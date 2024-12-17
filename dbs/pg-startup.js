@@ -9,6 +9,7 @@ const pgClient = new Client({
     port: process.env.PGPORT,
     database: process.env.PGDATABASE
 });
+
 await pgClient.connect();
 
 const res = await pgClient.query(`

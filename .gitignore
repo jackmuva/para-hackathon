@@ -131,3 +131,4 @@ dist
 
 *.db
 .DS_Store
+.idea

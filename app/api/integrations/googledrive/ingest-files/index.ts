@@ -1,4 +1,5 @@
 import {getLatestDriveCredential} from "@/app/api/integrations/googledrive/oauth";
+import {insertRecord} from "@/app/utlities/postgres-sql";
 
 type DriveFile = {
     kind: string,
@@ -13,6 +14,13 @@ type FileRecord = {
     mimeType: string,
     contents: string,
     link: string
+}
+
+type GoogleResponse = {
+    kind: string,
+    incompleteSearch: boolean,
+    files: Array<DriveFile>,
+    nextPageToken?: string
 }
 
 const acceptedFiles = [
@@ -53,3 +61,40 @@ export const getFileContents = async(file: DriveFile, email: string): Promise<Fi
 
     return record;
 }
+
+export const iteratePages = async(googleResponse: GoogleResponse, email: string): Promise<boolean> => {
+    let successfulResponse = true;
+
+    for(const file of googleResponse.files){
+        let content = await getFileContents(file, email);
+        let record = await insertRecord(content);
+        if(!record){
+            console.log("[DRIVE FILE INGESTION] " + file.name + " unable to be processed");
+        }
+    }
+    if(googleResponse.nextPageToken){
+        const driveCreds = await getLatestDriveCredential(email);
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+        headers.append("Authorization", "Bearer " + driveCreds[0].access_token);
+
+        const params = new URLSearchParams({
+            pageSize: "10",
+            pageToken: googleResponse.nextPageToken
+        }).toString();
+        const newGoogleResponse = await fetch("https://www.googleapis.com/drive/v3/files?" + params, {
+            method: "GET",
+            headers: headers
+        });
+
+        if(newGoogleResponse.status !== 200){
+            successfulResponse = false;
+        } else {
+            const body = await newGoogleResponse.json()
+            console.log(body);
+            successfulResponse = successfulResponse && await iteratePages(body, email);
+        }
+    }
+    return successfulResponse;
+}
+
