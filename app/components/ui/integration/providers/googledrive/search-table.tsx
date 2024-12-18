@@ -1,12 +1,10 @@
-import { SearchResult } from "./drive-panel";
 
-export const SearchTable = ({ searchResults }: { searchResults: Array<SearchResult> }) => {
+export const SearchTable = ({ searchResults }: { searchResults: Array<[]> }) => {
     console.log(searchResults);
-    const rows = searchResults.map((res: SearchResult) => {
+    const rows = searchResults.map((res: any) => {
         return (
-            <div className="flex space-x-4" id={res.fileName} key={res.fileName}>
-                <div>{res.fileName}</div>
-                <div>{res.link}</div>
+            <div className="flex space-x-4" id={res[0]} key={res[0]}>
+                <a href={res[1]} target="_blank">{res[0]}</a>
             </div>
         );
     });

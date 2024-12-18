@@ -5,14 +5,9 @@ import Image from "next/image";
 import { useState } from "react";
 import { SearchTable } from "./search-table";
 
-export type SearchResult = {
-    fileName: string,
-    link: string
-}
-
 export const DrivePanel = () => {
     const [search, setSearch] = useState("");
-    const [searchResults, setSearchResults] = useState<Array<SearchResult>>([]);
+    const [searchResults, setSearchResults] = useState<Array<[]>>([]);
 
     const listFiles = async () => {
         const headers = new Headers();
@@ -74,7 +69,6 @@ export const DrivePanel = () => {
         }
     }
 
-    console.log(searchResults);
     return (
         <div className="absolute top-40 left-0 z-10 w-[50rem] h-96 p-4 items-center bg-stone-200 border-2 border-stone-300 rounded-lg flex flex-col space-y-6 justify-start">
             <div className="flex space-x-2">
