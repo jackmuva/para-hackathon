@@ -38,7 +38,7 @@ function DriveButton({ enabled, openPanel }: { enabled: boolean, openPanel: () =
             {enabled &&
                 <div className={"flex flex-col"}>
                     <div>Google Drive is Integrated!</div>
-                    <div className={"text-xs"}>(Click to get file names)</div>
+                    <div className={"text-xs"}>(Click to see actions)</div>
                 </div>}
         </button>
     );

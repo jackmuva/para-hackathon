@@ -1,5 +1,5 @@
-import {getLatestDriveCredential} from "@/app/api/integrations/googledrive/oauth";
-import {insertRecord} from "@/app/utlities/postgres-sql";
+import { getLatestDriveCredential } from "@/app/api/integrations/googledrive/oauth";
+import { insertRecord } from "@/app/utlities/postgres-sql";
 
 type DriveFile = {
     kind: string,
@@ -8,12 +8,13 @@ type DriveFile = {
     name: string
 }
 
-type FileRecord = {
+export type FileRecord = {
     fileName: string,
     id: string,
     mimeType: string,
     content: string,
-    link: string
+    link: string,
+    email: string
 }
 
 type GoogleResponse = {
@@ -29,8 +30,8 @@ const acceptedFiles = [
     "application/vnd.google-apps.presentation",
 ]
 
-export const getFileContents = async(file: DriveFile, email: string): Promise<FileRecord | null> => {
-    if(!acceptedFiles.includes(file.mimeType)) return null;
+export const getFileContents = async (file: DriveFile, email: string): Promise<FileRecord | null> => {
+    if (!acceptedFiles.includes(file.mimeType)) return null;
 
     const driveCreds = await getLatestDriveCredential(email);
     const headers = new Headers();
@@ -53,7 +54,7 @@ export const getFileContents = async(file: DriveFile, email: string): Promise<Fi
         headers: headers
     });
 
-    const record: FileRecord = {content: "", fileName: file.name, id: file.id, link: "", mimeType: file.mimeType};
+    const record: FileRecord = { content: "", fileName: file.name, id: file.id, link: "", mimeType: file.mimeType, email: email };
     record.content = await new Response(fileContent.body).text();
 
     const metadata = await new Response(fileMetadata.body).json();
@@ -62,19 +63,19 @@ export const getFileContents = async(file: DriveFile, email: string): Promise<Fi
     return record;
 }
 
-export const iteratePages = async(googleResponse: GoogleResponse, email: string): Promise<boolean> => {
+export const iteratePages = async (googleResponse: GoogleResponse, email: string): Promise<boolean> => {
     let successfulResponse = true;
 
-    for(const file of googleResponse.files){
+    for (const file of googleResponse.files) {
         let content = await getFileContents(file, email);
-        if(content !== null) {
+        if (content !== null) {
             let record = await insertRecord(content);
             if (!record) {
                 console.log("[DRIVE FILE INGESTION] " + file.name + " unable to be processed");
             }
         }
     }
-    if(googleResponse.nextPageToken){
+    if (googleResponse.nextPageToken) {
         const driveCreds = await getLatestDriveCredential(email);
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
@@ -89,7 +90,7 @@ export const iteratePages = async(googleResponse: GoogleResponse, email: string)
             headers: headers
         });
 
-        if(newGoogleResponse.status !== 200){
+        if (newGoogleResponse.status !== 200) {
             successfulResponse = false;
         } else {
             const body = await newGoogleResponse.json()

@@ -18,7 +18,8 @@ const res = await pgClient.query(`
         mimeType VARCHAR(255),
         fileName VARCHAR(255),
         content TEXT,
-        link VARCHAR(255)
+        link VARCHAR(255),
+        email VARCHAR(255)
     )
 `);
 
