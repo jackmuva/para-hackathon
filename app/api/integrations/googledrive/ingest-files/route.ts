@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
         headers.append("Authorization", "Bearer " + driveCreds[0].access_token);
 
         const params = new URLSearchParams({
-            pageSize: "10",
+            pageSize: "1",
         }).toString();
         const googleResponse = await fetch("https://www.googleapis.com/drive/v3/files?" + params, {
             method: "GET",

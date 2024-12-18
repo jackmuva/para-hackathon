@@ -11,14 +11,19 @@ const pgClient = new Client({
 });
 
 export const insertRecord = async(record) => {
-    await pgClient.connect();
+    let result = {}
+    try {
+        await pgClient.connect();
 
-    const text = 'INSERT INTO DRIVE_FILES(id, mimeType, fileName, content, link) VALUES($1, $2, $3, $4, $5) RETURNING *'
-    const values = [record.id, record.mimeType, record.fileName, record.content, record.link]
+        const text = 'INSERT INTO DRIVE_FILES(id, mimeType, fileName, content, link) VALUES($1, $2, $3, $4, $5) RETURNING *'
+        const values = [record.id, record.mimeType, record.fileName, record.content, record.link]
 
-    const res = await pgClient.query(text, values)
-
-    await pgClient.end();
-
-    return res.rows[0];
+        const res = await pgClient.query(text, values);
+        result = res.rows[0];
+    } catch(err){
+        console.log("[POSTGRES] " + err);
+    } finally{
+        await pgClient.end();
+        return result;
+    }
 }
