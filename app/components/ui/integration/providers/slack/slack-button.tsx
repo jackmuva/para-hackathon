@@ -36,8 +36,8 @@ function SlackButton({enabled}: {enabled: boolean}){
     }
 
     return (
-        <button className={!enabled ? "p-2 px-4 text-center flex bg-gray-200 hover:bg-gray-400 shadow-2xl rounded-2xl items-center space-x-2 font-['Helvetica'] min-w-full" :
-            "p-2 px-4 text-center flex bg-green-200 hover:bg-green-400 shadow-2xl rounded-2xl items-center space-x-2 font-['Helvetica'] min-w-full"}
+        <button className={!enabled ? "p-2 px-4 text-center flex bg-gray-200 hover:bg-gray-400 shadow-2xl rounded-2xl justify-center items-center space-x-2 font-['Helvetica'] min-w-full" :
+            "p-2 px-4 text-center flex bg-green-200 hover:bg-green-400 shadow-2xl rounded-2xl justify-center items-center space-x-2 font-['Helvetica'] min-w-full"}
                 onClick={!enabled ? initiateSlackOauth : triggerSlack}>
             <Image
                 className="rounded-xl"

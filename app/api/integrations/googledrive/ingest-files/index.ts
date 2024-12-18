@@ -12,7 +12,7 @@ type FileRecord = {
     fileName: string,
     id: string,
     mimeType: string,
-    contents: string,
+    content: string,
     link: string
 }
 
@@ -53,8 +53,8 @@ export const getFileContents = async(file: DriveFile, email: string): Promise<Fi
         headers: headers
     });
 
-    const record: FileRecord = {contents: "", fileName: file.name, id: file.id, link: "", mimeType: file.mimeType};
-    record.contents = await new Response(fileContent.body).text();
+    const record: FileRecord = {content: "", fileName: file.name, id: file.id, link: "", mimeType: file.mimeType};
+    record.content = await new Response(fileContent.body).text();
 
     const metadata = await new Response(fileMetadata.body).json();
     record.link = metadata.webViewLink;
@@ -67,9 +67,11 @@ export const iteratePages = async(googleResponse: GoogleResponse, email: string)
 
     for(const file of googleResponse.files){
         let content = await getFileContents(file, email);
-        let record = await insertRecord(content);
-        if(!record){
-            console.log("[DRIVE FILE INGESTION] " + file.name + " unable to be processed");
+        if(content !== null) {
+            let record = await insertRecord(content);
+            if (!record) {
+                console.log("[DRIVE FILE INGESTION] " + file.name + " unable to be processed");
+            }
         }
     }
     if(googleResponse.nextPageToken){

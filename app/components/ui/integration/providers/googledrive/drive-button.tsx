@@ -1,11 +1,10 @@
 "use client";
 import Image from "next/image";
 import React from "react";
-import {getBackendOrigin} from "@/app/utlities/util";
-import {getSession} from "@/app/components/ui/integration/auth-action";
-import {toast} from "react-toastify";
+import { getBackendOrigin } from "@/app/utlities/util";
 
-function DriveButton({enabled}: {enabled: boolean}){
+function DriveButton({ enabled, openPanel }: { enabled: boolean, openPanel: () => void }) {
+
 
     const initiateDriveOauth = () => {
         const params = new URLSearchParams({
@@ -22,34 +21,11 @@ function DriveButton({enabled}: {enabled: boolean}){
         window.location.href = "https://accounts.google.com/o/oauth2/v2/auth?" + params;
     };
 
-    const openDrivePanel = async() => {
-        const headers = new Headers();
-        headers.append("Content-Type", "application/json");
-
-        const session = await getSession();
-        const response = await fetch(getBackendOrigin() + "/api/integrations/googledrive/ingest-files", {
-            method: "POST",
-            body: JSON.stringify({email: session?.user?.email}),
-            headers: headers
-        });
-
-        if(response.status === 200){
-            const body = await response.json();
-            console.log(body);
-            let result = "";
-            body.files.files.forEach((file: any) => {
-                result += file.name + ", "
-            });
-            toast.success(result);
-        } else{
-            toast.error("failed to get file names")
-        }
-    }
 
     return (
-        <button className={!enabled ? "p-2 px-4 text-center flex bg-gray-200 hover:bg-gray-400 shadow-2xl rounded-2xl items-center space-x-2 font-['Helvetica'] min-w-full" :
-            "p-2 px-4 text-center flex bg-green-200 hover:bg-green-400 shadow-2xl rounded-2xl items-center space-x-2 font-['Helvetica'] min-w-full"}
-                onClick={!enabled ? initiateDriveOauth : openDrivePanel}>
+        <button className={!enabled ? "p-2 px-4 text-center flex bg-gray-200 hover:bg-gray-400 shadow-2xl rounded-2xl items-center justify-center space-x-2 font-['Helvetica'] min-w-full" :
+            "p-2 px-4 text-center flex bg-green-200 hover:bg-green-400 shadow-2xl rounded-2xl items-center justify-center space-x-2 font-['Helvetica'] min-w-full"}
+            onClick={!enabled ? initiateDriveOauth : openPanel}>
             <Image
                 className="rounded-xl"
                 src="/google-drive-logo.png"
@@ -58,12 +34,12 @@ function DriveButton({enabled}: {enabled: boolean}){
                 height={40}
                 priority
             />
-            { !enabled && <div>Integrate with Google Drive</div> }
-            { enabled &&
+            {!enabled && <div>Integrate with Google Drive</div>}
+            {enabled &&
                 <div className={"flex flex-col"}>
                     <div>Google Drive is Integrated!</div>
                     <div className={"text-xs"}>(Click to get file names)</div>
-                </div> }
+                </div>}
         </button>
     );
 }

@@ -1,8 +1,8 @@
 import pg from 'pg';
-const { Client } = pg;
+const { Pool } = pg;
 import 'dotenv/config';
 
-const pgClient = new Client({
+const pool = new Pool({
     user: process.env.PGUSER,
     password: process.env.PGPASSWORD,
     host: process.env.PGHOST,
@@ -13,17 +13,29 @@ const pgClient = new Client({
 export const insertRecord = async(record) => {
     let result = {}
     try {
-        await pgClient.connect();
-
         const text = 'INSERT INTO DRIVE_FILES(id, mimeType, fileName, content, link) VALUES($1, $2, $3, $4, $5) RETURNING *'
         const values = [record.id, record.mimeType, record.fileName, record.content, record.link]
 
-        const res = await pgClient.query(text, values);
+        const res = await pool.query(text, values);
         result = res.rows[0];
     } catch(err){
         console.log("[POSTGRES] " + err);
-    } finally{
-        await pgClient.end();
-        return result;
     }
+    return result;
 }
+
+process.on('SIGINT',  async() => {
+    console.log('SIGINT signal received.');
+    const res = await pool.end();
+    if(res || true){
+        process.exit(0);
+    }
+});
+
+process.on('SIGTERM',  async() => {
+    console.log('SIGTERM signal received.');
+    const res = await pool.end();
+    if(res || true){
+        process.exit(0);
+    }
+});
