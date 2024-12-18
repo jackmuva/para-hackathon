@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import {getLatestDriveCredential, refreshDriveAccessToken} from "@/app/api/integrations/googledrive/oauth";
-import {getDriveCredentialByEmail} from "@/app/utlities/drive-sqlite-utils";
-import {getFileContents, iteratePages} from "@/app/api/integrations/googledrive/ingest-files/index";
+import { getLatestDriveCredential } from "@/app/api/integrations/googledrive/oauth";
+import { iteratePages } from "@/app/api/integrations/googledrive/ingest-files/index";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
     const response = await request.json();
-    try{
+    try {
         const driveCreds = await getLatestDriveCredential(response.email);
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
@@ -26,23 +25,23 @@ export async function POST(request: NextRequest) {
 
         const successful = await iteratePages(body, response.email);
 
-        if(successful) {
+        if (successful) {
             return NextResponse.json(
-                {status: 200},
+                { status: 200 },
             );
         } else {
             console.error("[Google Drive ingest files API]", body);
             return NextResponse.json(
-                {error: (body as Error).message},
-                {status: 500},
+                { error: (body as Error).message },
+                { status: 500 },
             );
         }
 
-    }catch(error) {
+    } catch (error) {
         console.error("[Google Drive ingest files API]", error);
         return NextResponse.json(
-            {error: (error as Error).message},
-            {status: 500},
+            { error: (error as Error).message },
+            { status: 500 },
         );
     }
 }

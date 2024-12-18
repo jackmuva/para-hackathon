@@ -60,9 +60,10 @@ export const DrivePanel = () => {
         });
 
         if (response.status === 200) {
-            toast.success("ingestion triggered");
+            const body = await response.json();
+            console.log(body);
         } else {
-            toast.error("failed to get file names")
+            toast.error("failed to search");
         }
     }
 

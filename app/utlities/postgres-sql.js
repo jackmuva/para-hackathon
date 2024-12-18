@@ -24,6 +24,20 @@ export const insertRecord = async (record) => {
     return result;
 }
 
+export const queryContent = async (searchTerm, email) => {
+    let result = [];
+    try {
+        const text = `SELECT * FROM DRIVE_FILES WHERE UPPER(CONTENT) LIKE '%` + searchTerm.toUpperCase() + `%' AND 
+            EMAIL='` + email + `' LIMIT 10`
+
+        const res = await pool.query({ text: text, rowMode: 'array' });
+        result = res.rows;
+    } catch (err) {
+        console.log("[POSTGRES] " + err);
+    }
+    return result;
+}
+
 process.on('SIGINT', async () => {
     console.log('SIGINT signal received.');
     const res = await pool.end();
