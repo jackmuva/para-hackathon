@@ -27,7 +27,7 @@ export const insertRecord = async (record) => {
 export const queryContent = async (searchTerm, email) => {
     let result = [];
     try {
-        const text = `SELECT * FROM DRIVE_FILES WHERE UPPER(CONTENT) LIKE '%` + searchTerm.toUpperCase() + `%' AND 
+        const text = `SELECT fileName, link FROM DRIVE_FILES WHERE UPPER(CONTENT) LIKE '%` + searchTerm.toUpperCase() + `%' AND 
             EMAIL='` + email + `' LIMIT 10`
 
         const res = await pool.query({ text: text, rowMode: 'array' });
