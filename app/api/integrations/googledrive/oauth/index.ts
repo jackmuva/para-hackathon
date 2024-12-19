@@ -3,7 +3,7 @@ import {
     insertDriveCredential,
     updateDriveCredential
 } from "@/app/utlities/drive-sqlite-utils";
-import {uuidv4} from "uuidv7";
+import { uuidv4 } from "uuidv7";
 
 type Credential = {
     id: string,
@@ -15,7 +15,7 @@ type Credential = {
 }
 
 
-export const refreshDriveAccessToken = async(cred: Credential, email: string): Promise<boolean> => {
+export const refreshDriveAccessToken = async (cred: Credential, email: string): Promise<boolean> => {
     let refreshed = false;
     const params = {
         client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
@@ -52,7 +52,7 @@ export type googleResponse = {
 
 export async function loadDriveCredentials(body: googleResponse): Promise<boolean> {
     let loaded = false;
-    if(!body.access_token) return loaded;
+    if (!body.access_token) return loaded;
 
     let now = new Date();
     const credential: Credential = {
@@ -64,18 +64,18 @@ export async function loadDriveCredentials(body: googleResponse): Promise<boolea
     };
     const rec = await getDriveCredentialByEmail(credential.email);
 
-    if(rec.length === 0){
+    if (rec.length === 0) {
         console.log("creating");
         const successful = await insertDriveCredential(credential);
-        if(successful) loaded = true;
-    } else{
+        if (successful) loaded = true;
+    } else {
         console.log("updating");
         const successful = await updateDriveCredential(credential);
-        if(successful) loaded = true;
+        if (successful) loaded = true;
     }
     return loaded;
 }
-export const getLatestDriveCredential = async(email: string) => {
+export const getLatestDriveCredential = async (email: string) => {
     let driveCreds = await getDriveCredentialByEmail(email);
     if (driveCreds[0] && new Date(Number(driveCreds[0].access_token_expiration)) < new Date()) {
         console.log("need refresh");

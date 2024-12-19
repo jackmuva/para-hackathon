@@ -132,3 +132,5 @@ dist
 *.db
 .DS_Store
 .idea
+
+.trigger
