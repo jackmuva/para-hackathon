@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getLatestDriveCredential } from "@/app/api/integrations/googledrive/oauth";
-import { tasks } from "@trigger.dev/sdk/v3";
+import { configure, tasks } from "@trigger.dev/sdk/v3";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+configure({
+	secretKey: process.env.TRIGGER_SECRET_KEY // starts with tr_dev_ or tr_prod_
+});
 
 export async function POST(request: NextRequest) {
 	const response = await request.json();

@@ -8,9 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "sqlite-setup": "node dbs/sqlite-startup.js",
-    "pg-setup": "node dbs/pg-startup.js",
-    "trigger": "npx trigger.dev@latest dev"
+    "sqlite-setup": "node setup/sqlite-startup.js",
+    "pg-setup": "node setup/pg-startup.js",
+    "trigger": "npx trigger.dev@latest dev",
+    "trigger-setup": "node setup/trigger-setup.js"
   },
   "dependencies": {
     "@apidevtools/swagger-parser": "^10.1.0",

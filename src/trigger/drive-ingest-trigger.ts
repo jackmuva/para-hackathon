@@ -1,4 +1,4 @@
-import { logger, task, wait } from "@trigger.dev/sdk/v3";
+import { task, envvars } from "@trigger.dev/sdk/v3";
 
 export const digestFiles = task({
   id: "Drive-File-Ingestion",
@@ -20,26 +20,39 @@ export const digestFiles = task({
     const body = await googleResponse.json()
     console.log(body);
 
-    const successful = await iteratePages(body, payload.email, payload.token);
+    const pgUser = await envvars.retrieve("proj_aiyirhllavhklpqransj", "dev", "PGUSER");
+    const pgPassword = await envvars.retrieve("proj_aiyirhllavhklpqransj", "dev", "PGPASSWORD");
+    const pgHost = await envvars.retrieve("proj_aiyirhllavhklpqransj", "dev", "PGHOST");
+    const pgPort = await envvars.retrieve("proj_aiyirhllavhklpqransj", "dev", "PGPORT");
+    const pgDatabase = await envvars.retrieve("proj_aiyirhllavhklpqransj", "dev", "PGDATABASE");
 
+    const pool = initializePool(pgUser.value, pgPassword.value, pgHost.value, Number(pgPort.value), pgDatabase.value);
+
+    const successful = await iteratePages(body, payload.email, payload.token, pool);
+
+    return {
+      success: successful
+    }
   }
 });
 
 
-
+//@ts-ignore
 import pg from 'pg';
 const { Pool } = pg;
-import 'dotenv/config';
 
-const pool = new Pool({
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  host: process.env.PGHOST,
-  port: process.env.PGPORT,
-  database: process.env.PGDATABASE
-});
+const initializePool = (pgUser: string, pgPassword: string, pgHost: string, pgPort: number, pgDatabase: string) => {
+  const pool = new Pool({
+    user: pgUser,
+    password: pgPassword,
+    host: pgHost,
+    port: pgPort,
+    database: pgDatabase
+  });
+  return pool;
+}
 
-export const insertRecord = async (record: any) => {
+export const insertRecord = async (record: any, pool: any) => {
   let result = {}
   try {
     const text = 'INSERT INTO DRIVE_FILES(id, mimeType, fileName, content, link, email) VALUES($1, $2, $3, $4, $5, $6) RETURNING *'
@@ -116,13 +129,13 @@ export const getFileContents = async (file: DriveFile, email: string, driveCreds
   return record;
 }
 
-export const iteratePages = async (googleResponse: GoogleResponse, email: string, driveCreds: string): Promise<boolean> => {
+export const iteratePages = async (googleResponse: GoogleResponse, email: string, driveCreds: string, pool: any): Promise<boolean> => {
   let successfulResponse = true;
 
   for (const file of googleResponse.files) {
     let content = await getFileContents(file, email, driveCreds);
     if (content !== null) {
-      let record = await insertRecord(content);
+      let record = await insertRecord(content, pool);
       if (!record) {
         console.log("[DRIVE FILE INGESTION] " + file.name + " unable to be processed");
       }
@@ -147,7 +160,7 @@ export const iteratePages = async (googleResponse: GoogleResponse, email: string
     } else {
       const body = await newGoogleResponse.json()
       console.log(body);
-      successfulResponse = successfulResponse && await iteratePages(body, email, driveCreds);
+      successfulResponse = successfulResponse && await iteratePages(body, email, driveCreds, pool);
     }
   }
   return successfulResponse;
