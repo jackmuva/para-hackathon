@@ -3,7 +3,7 @@ import { task, envvars } from "@trigger.dev/sdk/v3";
 export const digestFiles = task({
   id: "Drive-File-Ingestion",
   // Set an optional maxDuration to prevent tasks from running indefinitely
-  maxDuration: 300, // Stop executing after 300 secs (5 mins) of compute
+  maxDuration: 1800,
   run: async (payload: any, { ctx }) => {
 
     const headers = new Headers();

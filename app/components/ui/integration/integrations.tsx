@@ -6,6 +6,7 @@ import DriveButton from "@/app/components/ui/integration/providers/googledrive/d
 import SlackButton from "@/app/components/ui/integration/providers/slack/slack-button";
 import SalesforceButton from "@/app/components/ui/integration/providers/salesforce/salesforce-button";
 import { DrivePanel } from "./providers/googledrive/drive-panel";
+import { SalesforcePanel } from "./providers/salesforce/salesforce-panel";
 
 const Integrations = () => {
     const [integrations, setIntegrations] = useState({
@@ -16,6 +17,8 @@ const Integrations = () => {
         }
     })
     const [openPanel, setOpenPanel] = useState(false);
+    const [openSalesforcePanel, setOpenSalesforcePanel] = useState(false);
+
 
     useEffect(() => {
         const headers = new Headers();
@@ -39,6 +42,11 @@ const Integrations = () => {
         setOpenPanel(!openPanel);
     }
 
+    const toggleSalesforcePanel = () => {
+        setOpenSalesforcePanel(!openSalesforcePanel);
+    }
+
+
     return (
         <div className={"flex flex-col space-y-2 justify-center items-center absolute top-36 left-1/2 transform -translate-x-1/2 -translate-y-1/2"}>
             <div className={"text-2xl font-bold"}>
@@ -47,9 +55,10 @@ const Integrations = () => {
             <div className={"w-1/2 flex items-center justify-center space-x-4 items-stretch"}>
                 <DriveButton enabled={integrations.hasCreds.drive} openPanel={openDrivePanel}></DriveButton>
                 <SlackButton enabled={integrations.hasCreds.slack}></SlackButton>
-                <SalesforceButton enabled={integrations.hasCreds.salesforce}></SalesforceButton>
+                <SalesforceButton enabled={integrations.hasCreds.salesforce} openPanel={toggleSalesforcePanel}></SalesforceButton>
             </div>
             {openPanel && <DrivePanel />}
+            {openSalesforcePanel && <SalesforcePanel />}
         </div>
     );
 }
