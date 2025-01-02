@@ -2,12 +2,17 @@ import { getSession } from "@/app/components/ui/integration/auth-action";
 import { toast } from "react-toastify";
 import { getBackendOrigin } from "@/app/utlities/util";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { ContactTable } from "./contacts-table";
 
 export const SalesforcePanel = () => {
-    const [search, setSearch] = useState<string>("");
+    const [contacts, setContacts] = useState([]);
 
-    const listContacts = async () => {
+    useEffect(() => {
+        retrieveContacts();
+    }, []);
+
+    const listAccounts = async () => {
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
 
@@ -50,16 +55,31 @@ export const SalesforcePanel = () => {
 
     }
 
-    const handleSearch = async () => {
+    const retrieveContacts = async () => {
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
 
-    };
+        const session = await getSession();
+        const response = await fetch(getBackendOrigin() + "/api/integrations/salesforce/contacts", {
+            method: "POST",
+            body: JSON.stringify({ email: session?.user?.email }),
+            headers: headers
+        });
+
+        if (response.status === 200) {
+            const body = await response.json();
+            setContacts(body.results);
+        } else {
+            toast.error("failed to retrieve contacts");
+        }
+    }
 
 
     return (
         <div className="absolute top-40 left-0 z-10 w-[50rem] h-fit p-4 items-center bg-stone-200 border-2 border-stone-300 rounded-lg flex flex-col space-y-6 justify-start">
             <div className="flex space-x-2">
                 <button className={"p-2 px-4 text-center flex bg-green-200 hover:bg-green-400 shadow-2xl rounded-2xl items-center justify-center font-['Helvetica'] w-fit border-2 border-gray-400 basis-1/2"}
-                    onClick={listContacts}>
+                    onClick={listAccounts}>
                     <Image
                         className="rounded-xl"
                         src="/santa-list.png"
@@ -80,27 +100,10 @@ export const SalesforcePanel = () => {
                         height={40}
                         priority
                     />
-                    Import Salesforce Contacts
+                    Import Contacts
                 </button>
             </div>
-            <form>
-                <label>Search For Contacts By Name:
-                    <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-                        className="mx-2 px-2 rounded-lg" />
-                </label>
-            </form>
-            <button className={"p-2 px-4 text-center flex bg-blue-200 hover:bg-green-400 shadow-2xl rounded-2xl items-center justify-center font-['Helvetica'] w-fit border-2 border-gray-400 "}
-                onClick={handleSearch}>
-                <Image
-                    className="rounded-xl"
-                    src="/dog-search.webp"
-                    alt="Google Logo"
-                    width={40}
-                    height={40}
-                    priority
-                />
-                Search!
-            </button>
+            <ContactTable contacts={contacts} />
         </div>
     );
 };

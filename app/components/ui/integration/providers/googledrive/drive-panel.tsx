@@ -37,7 +37,7 @@ export const DrivePanel = () => {
         headers.append("Content-Type", "application/json");
 
         const session = await getSession();
-        const response = await fetch(getBackendOrigin() + "/api/integrations/googledrive/ingest-files-bg", {
+        const response = await fetch(getBackendOrigin() + "/api/integrations/googledrive/ingest-files", {
             method: "POST",
             body: JSON.stringify({ email: session?.user?.email }),
             headers: headers

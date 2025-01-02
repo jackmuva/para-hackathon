@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
             const refreshed = await refreshSalesforceToken(salesforceCreds[0]);
             if (refreshed) {
                 salesforceCreds = await getSalesforceCredentialByEmail(response.email);
-                accountResponse = await getAccounts(salesforceCreds);
+                accountResponse = await getAccounts(salesforceCreds[0]);
             }
         }
 

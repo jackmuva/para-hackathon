@@ -52,11 +52,11 @@ export const insertSalesforceRecord = async (record) => {
     return result;
 }
 
-export const querySalesforceContent = async (searchTerm, email) => {
+export const querySalesforceContent = async (email) => {
     let result = [];
     try {
-        const text = `SELECT full_name, title, contact_email FROM SALESFORCE_CONTACTS WHERE UPPER(full_name) LIKE '%` + searchTerm.toUpperCase() + `%' AND 
-            USER_EMAIL='` + email + `' LIMIT 10`
+        const text = `SELECT full_name, title, contact_email FROM SALESFORCE_CONTACTS WHERE 
+            USER_EMAIL='` + email + `'`
 
         const res = await pool.query({ text: text, rowMode: 'array' });
         result = res.rows;
