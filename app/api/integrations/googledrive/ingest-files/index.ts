@@ -1,5 +1,5 @@
 import { getLatestDriveCredential } from "@/app/api/integrations/googledrive/oauth";
-import { insertRecord } from "@/app/utlities/postgres-sql";
+import { insertDriveRecord } from "@/app/utlities/postgres-sql";
 
 type DriveFile = {
     kind: string,
@@ -69,7 +69,7 @@ export const iteratePages = async (googleResponse: GoogleResponse, email: string
     for (const file of googleResponse.files) {
         let content = await getFileContents(file, email);
         if (content !== null) {
-            let record = await insertRecord(content);
+            let record = await insertDriveRecord(content);
             if (!record) {
                 console.log("[DRIVE FILE INGESTION] " + file.name + " unable to be processed");
             }

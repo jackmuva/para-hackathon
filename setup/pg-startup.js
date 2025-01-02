@@ -13,8 +13,8 @@ const pgClient = new Client({
 await pgClient.connect();
 
 const res = await pgClient.query(`
-    CREATE TABLE DRIVE_FILES (
-        id VARCHAR(255),
+    CREATE TABLE IF NOT EXISTS DRIVE_FILES (
+        id VARCHAR(255) PRIMARY KEY,
         mimeType VARCHAR(255),
         fileName VARCHAR(255),
         content TEXT,
@@ -22,5 +22,16 @@ const res = await pgClient.query(`
         email VARCHAR(255)
     )
 `);
+
+const sec = await pgClient.query(`
+    CREATE TABLE IF NOT EXISTS SALESFORCE_CONTACTS(
+        id VARCHAR(255) PRIMARY KEY,
+        full_name VARCHAR(255),
+        title VARCHAR(255),
+        contact_email VARCHAR(255),
+        user_email VARCHAR(255)
+    )
+`);
+
 
 await pgClient.end();

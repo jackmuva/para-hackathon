@@ -10,7 +10,7 @@ const pool = new Pool({
     database: process.env.PGDATABASE
 });
 
-export const insertRecord = async (record) => {
+export const insertDriveRecord = async (record) => {
     let result = {}
     try {
         const text = 'INSERT INTO DRIVE_FILES(id, mimeType, fileName, content, link, email) VALUES($1, $2, $3, $4, $5, $6) RETURNING *'
@@ -24,7 +24,7 @@ export const insertRecord = async (record) => {
     return result;
 }
 
-export const queryContent = async (searchTerm, email) => {
+export const queryDriveContent = async (searchTerm, email) => {
     let result = [];
     try {
         const text = `SELECT fileName, link FROM DRIVE_FILES WHERE UPPER(CONTENT) LIKE '%` + searchTerm.toUpperCase() + `%' AND 
@@ -37,6 +37,35 @@ export const queryContent = async (searchTerm, email) => {
     }
     return result;
 }
+
+export const insertSalesforceRecord = async (record) => {
+    let result = {}
+    try {
+        const text = 'INSERT INTO SALESFORCE_CONTACTS(id, full_name, title, contact_email, user_email) VALUES($1, $2, $3, $4, $5) RETURNING *'
+        const values = [record.id, record.full_name, record.title, record.contact_email, record.user_email]
+
+        const res = await pool.query(text, values);
+        result = res.rows[0];
+    } catch (err) {
+        console.log("[POSTGRES] " + err);
+    }
+    return result;
+}
+
+export const querySalesforceContent = async (searchTerm, email) => {
+    let result = [];
+    try {
+        const text = `SELECT full_name, title, contact_email FROM SALESFORCE_CONTACTS WHERE UPPER(full_name) LIKE '%` + searchTerm.toUpperCase() + `%' AND 
+            USER_EMAIL='` + email + `' LIMIT 10`
+
+        const res = await pool.query({ text: text, rowMode: 'array' });
+        result = res.rows;
+    } catch (err) {
+        console.log("[POSTGRES] " + err);
+    }
+    return result;
+}
+
 
 process.on('SIGINT', async () => {
     console.log('SIGINT signal received.');

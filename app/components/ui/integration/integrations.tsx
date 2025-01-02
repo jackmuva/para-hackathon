@@ -16,8 +16,7 @@ const Integrations = () => {
             salesforce: false
         }
     })
-    const [openPanel, setOpenPanel] = useState(false);
-    const [openSalesforcePanel, setOpenSalesforcePanel] = useState(false);
+    const [openPanel, setOpenPanel] = useState({ drive: false, salesforce: false });
 
 
     useEffect(() => {
@@ -39,11 +38,11 @@ const Integrations = () => {
     }, []);
 
     const openDrivePanel = () => {
-        setOpenPanel(!openPanel);
+        setOpenPanel({ drive: !openPanel.drive, salesforce: false });
     }
 
     const toggleSalesforcePanel = () => {
-        setOpenSalesforcePanel(!openSalesforcePanel);
+        setOpenPanel({ drive: false, salesforce: !openPanel.salesforce });
     }
 
 
@@ -57,8 +56,8 @@ const Integrations = () => {
                 <SlackButton enabled={integrations.hasCreds.slack}></SlackButton>
                 <SalesforceButton enabled={integrations.hasCreds.salesforce} openPanel={toggleSalesforcePanel}></SalesforceButton>
             </div>
-            {openPanel && <DrivePanel />}
-            {openSalesforcePanel && <SalesforcePanel />}
+            {openPanel.drive && <DrivePanel />}
+            {openPanel.salesforce && <SalesforcePanel />}
         </div>
     );
 }

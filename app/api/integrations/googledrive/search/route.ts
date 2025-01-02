@@ -1,4 +1,4 @@
-import { queryContent } from "@/app/utlities/postgres-sql";
+import { queryDriveContent } from "@/app/utlities/postgres-sql";
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest) {
 	const response = await request.json();
 	try {
-		const results = await queryContent(response.search, response.email);
+		const results = await queryDriveContent(response.search, response.email);
 
 		return NextResponse.json(
 			{ results: results },
