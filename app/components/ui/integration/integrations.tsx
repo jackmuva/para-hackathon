@@ -51,7 +51,7 @@ const Integrations = () => {
             <div className={"text-2xl font-bold"}>
                 Integrations:
             </div>
-            <div className={"w-1/2 flex items-center justify-center space-x-4"}>
+            <div className={"w-1/2 flex justify-center space-x-4 items-stretch"}>
                 <DriveButton enabled={integrations.hasCreds.drive} openPanel={openDrivePanel}></DriveButton>
                 <SlackButton enabled={integrations.hasCreds.slack}></SlackButton>
                 <SalesforceButton enabled={integrations.hasCreds.salesforce} openPanel={toggleSalesforcePanel}></SalesforceButton>

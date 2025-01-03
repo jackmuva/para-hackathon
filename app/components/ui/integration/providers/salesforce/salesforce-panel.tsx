@@ -4,9 +4,11 @@ import { getBackendOrigin } from "@/app/utlities/util";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { ContactTable } from "./contacts-table";
+import { ContactForm } from "./contact-form";
 
 export const SalesforcePanel = () => {
     const [contacts, setContacts] = useState([]);
+    const [openForm, setOpenForm] = useState(false);
 
     useEffect(() => {
         retrieveContacts();
@@ -74,6 +76,9 @@ export const SalesforcePanel = () => {
         }
     }
 
+    const toggleContactForm = () => {
+        setOpenForm(!openForm);
+    }
 
     return (
         <div className="absolute top-40 left-0 z-10 w-[50rem] h-fit p-4 items-center bg-stone-200 border-2 border-stone-300 rounded-lg flex flex-col space-y-6 justify-start">
@@ -102,8 +107,22 @@ export const SalesforcePanel = () => {
                     />
                     Import Contacts
                 </button>
+                <button className={"p-2 px-4 text-center flex bg-green-200 hover:bg-green-400 shadow-2xl rounded-2xl items-center justify-center font-['Helvetica'] w-fit border-2 border-gray-400 basis-1/2"}
+                    onClick={toggleContactForm}>
+                    <Image
+                        className="rounded-xl"
+                        src="/contact.png"
+                        alt="Google Logo"
+                        width={40}
+                        height={40}
+                        priority
+                    />
+                    Create New Contact
+                </button>
+
             </div>
-            <ContactTable contacts={contacts} />
+            {!openForm && <ContactTable contacts={contacts} />}
+            {openForm && <ContactForm />}
         </div>
     );
 };
