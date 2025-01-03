@@ -3,8 +3,8 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { getSession } from "../../auth-action";
 
-export const ContactForm = () => {
-    const [contact, setContact] = useState({ name: "", title: "", email: "" });
+export const ContactForm = ({ toggle }: { toggle: () => void }) => {
+    const [contact, setContact] = useState({ FirstName: "", LastName: "", Title: "", Email: "" });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -17,7 +17,6 @@ export const ContactForm = () => {
     const handleSubmit = async () => {
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
-        console.log(contact);
 
         const session = await getSession();
         const response = await fetch(getBackendOrigin() + "/api/integrations/salesforce/new-contact", {
@@ -27,6 +26,7 @@ export const ContactForm = () => {
         });
         if (response.status === 200) {
             toast.success("Contact Created");
+            toggle();
         } else {
             toast.error("Could not create contact")
         }
@@ -34,21 +34,26 @@ export const ContactForm = () => {
 
     return (
         <div>
-            <form className="flex flex-col space-y-2 items-center">
+            <div className="flex flex-col space-y-2 items-center">
                 <div>
-                    <label className="mr-2">Full Name: </label>
-                    <input onChange={handleChange} name="name" value={contact.name} type="text" className="rounded px-2" />
+                    <label className="mr-2">First Name: </label>
+                    <input onChange={handleChange} name="FirstName" value={contact.FirstName} type="text" className="rounded px-2" />
                 </div>
                 <div>
+                    <label className="mr-2">Last Name: </label>
+                    <input onChange={handleChange} name="LastName" value={contact.LastName} type="text" className="rounded px-2" />
+                </div>
+
+                <div>
                     <label className="mr-2">Title: </label>
-                    <input onChange={handleChange} name="title" value={contact.title} type="text" className="rounded px-2" />
+                    <input onChange={handleChange} name="Title" value={contact.Title} type="text" className="rounded px-2" />
                 </div>
                 <div>
                     <label className="mr-2">Email: </label>
-                    <input onChange={handleChange} name="email" value={contact.email} type="email" className="rounded px-2" />
+                    <input onChange={handleChange} name="Email" value={contact.Email} type="email" className="rounded px-2" />
                 </div>
-                <button onClick={handleSubmit}>Create</button>
-            </form>
+                <button className="shadow-xl rounded-lg bg-blue-200 hover:-translate-y-0.5 py-2 px-4" onClick={handleSubmit}>Create</button>
+            </div>
         </div>
     );
 };

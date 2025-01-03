@@ -122,7 +122,7 @@ export const SalesforcePanel = () => {
 
             </div>
             {!openForm && <ContactTable contacts={contacts} />}
-            {openForm && <ContactForm />}
+            {openForm && <ContactForm toggle={toggleContactForm} />}
         </div>
     );
 };

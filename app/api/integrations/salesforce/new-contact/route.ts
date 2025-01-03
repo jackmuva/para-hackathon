@@ -31,10 +31,8 @@ const createContact = async (contact: any, salesforceCreds: SalesforceCredential
 	let res = await fetch(salesforceCreds.instance_url + "/services/data/v62.0/sobjects/Contact/", {
 		method: "POST",
 		headers: headers,
-		body: contact
+		body: JSON.stringify(contact)
 	});
-	console.log(res);
-
 	//401 is not always generalizable
 	//the standard error is "invalid_grant"
 	if (res.status === 401 && !refresh) {
@@ -46,10 +44,12 @@ const createContact = async (contact: any, salesforceCreds: SalesforceCredential
 		}
 	} else if (res.status === 401 && refresh) {
 		successful = false;
-	} else if (res.status === 200) {
+	} else if (res.status === 201) {
 		const body = await res.json();
-		await insertSalesforceRecord({ id: body.Id, full_name: contact.name, title: contact.title, contact_email: contact.email, user_email: salesforceCreds.email });
-		console.log(body);
+		await insertSalesforceRecord({
+			id: body.id, full_name: contact.FirstName + " " + contact.LastName,
+			title: contact.Title, contact_email: contact.Email, user_email: salesforceCreds.email
+		});
 	}
 	return successful;
 

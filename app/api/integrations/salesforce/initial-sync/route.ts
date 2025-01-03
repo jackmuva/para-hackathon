@@ -29,7 +29,7 @@ const syncContacts = async (salesforceCreds: SalesforceCredential, refresh: bool
 	headers.append("Authorization", "Bearer " + salesforceCreds.access_token);
 
 	const params = new URLSearchParams({
-		q: "SELECT FIELDS(STANDARD) from Contact LIMIT 100"
+		q: "SELECT FIELDS(STANDARD) from Contact"
 	}).toString();
 
 	let res = await fetch(nextPage ? salesforceCreds.instance_url + nextPage : salesforceCreds.instance_url + "/services/data/v62.0/query?" + params, {
