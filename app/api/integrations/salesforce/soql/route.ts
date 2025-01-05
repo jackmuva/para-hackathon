@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSalesforceCredentialByEmail } from "@/app/utlities/salesforce-sqlite-utils";
+import { getSalesforceCredentialByEmail } from "@/app/utlities/postgres-sql";
 import { refreshSalesforceToken, SalesforceCredential } from "@/app/api/integrations/salesforce/oauth";
 
 export async function POST(request: NextRequest) {

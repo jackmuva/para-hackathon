@@ -12,7 +12,7 @@ const pgClient = new Client({
 
 await pgClient.connect();
 
-const res = await pgClient.query(`
+await pgClient.query(`
     CREATE TABLE IF NOT EXISTS DRIVE_FILES (
         id VARCHAR(255) PRIMARY KEY,
         mimeType VARCHAR(255),
@@ -23,7 +23,7 @@ const res = await pgClient.query(`
     )
 `);
 
-const sec = await pgClient.query(`
+await pgClient.query(`
     CREATE TABLE IF NOT EXISTS SALESFORCE_CONTACTS(
         id VARCHAR(255) PRIMARY KEY,
         full_name VARCHAR(255),
@@ -33,5 +33,34 @@ const sec = await pgClient.query(`
     )
 `);
 
+
+await pgClient.query(`
+    CREATE TABLE IF NOT EXISTS drive_credentials (
+        id TEXT,
+        email TEXT PRIMARY KEY,
+        access_token TEXT,
+        refresh_token TEXT,
+        access_token_expiration TEXT
+    );
+`);
+
+await pgClient.query(`
+    CREATE TABLE IF NOT EXISTS slack_credentials (
+        id TEXT,
+        email TEXT PRIMARY KEY,
+        access_token TEXT NOT NULL,
+        incoming_webhook TEXT NOT NULL
+    );
+`);
+
+await pgClient.query(`
+    CREATE TABLE IF NOT EXISTS salesforce_credentials (
+        id TEXT,
+        email TEXT PRIMARY KEY,
+        access_token TEXT,
+        refresh_token TEXT,
+        instance_url TEXT
+    );
+`);
 
 await pgClient.end();

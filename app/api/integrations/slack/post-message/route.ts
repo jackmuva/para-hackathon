@@ -1,5 +1,5 @@
-import {NextRequest, NextResponse} from "next/server";
-import {getSlackCredentialByEmail} from "@/app/utlities/slack-sqlite-utils";
+import { NextRequest, NextResponse } from "next/server";
+import { getSlackCredentialByEmail } from "@/app/utlities/postgres-sql";
 
 export async function POST(request: NextRequest) {
     const response = await request.json();
@@ -20,14 +20,14 @@ export async function POST(request: NextRequest) {
         });
 
         return NextResponse.json(
-            {message: res},
-            {status: 200}
+            { message: res },
+            { status: 200 }
         );
     } catch (error) {
         console.error("[Google Drive Oauth API]", error);
         return NextResponse.json(
-            {error: (error as Error).message},
-            {status: 500},
+            { error: (error as Error).message },
+            { status: 500 },
         );
     }
 }

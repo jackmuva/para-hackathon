@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSalesforceCredentialByEmail } from "@/app/utlities/salesforce-sqlite-utils";
-import { refreshSalesforceToken, SalesforceCredential } from "@/app/api/integrations/salesforce/oauth";
+import { getSalesforceCredentialByEmail } from "@/app/utlities/postgres-sql";
+import { refreshSalesforceToken } from "@/app/api/integrations/salesforce/oauth";
 import { insertSalesforceRecord } from "@/app/utlities/postgres-sql";
 
 export async function POST(request: NextRequest) {
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
 	}
 }
 
-const createContact = async (contact: any, salesforceCreds: SalesforceCredential, refresh: boolean): Promise<boolean> => {
+const createContact = async (contact: any, salesforceCreds: any, refresh: boolean): Promise<boolean> => {
 	let successful = true;
 	const headers = new Headers();
 	headers.append("Content-Type", "application/json");

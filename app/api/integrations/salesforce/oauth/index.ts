@@ -2,7 +2,7 @@ import {
     getSalesforceCredentialByEmail,
     insertSalesforceCredential,
     updateSalesforceCredential
-} from "@/app/utlities/salesforce-sqlite-utils";
+} from "@/app/utlities/postgres-sql";
 
 export const refreshSalesforceToken = async (credential: SalesforceCredential): Promise<boolean> => {
     const headers = new Headers();

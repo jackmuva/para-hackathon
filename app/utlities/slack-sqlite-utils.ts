@@ -1,6 +1,6 @@
 import sqlite3 from "sqlite3";
-import {fetchAll, fetchFirst, insertUpdate} from "@/app/utlities/sqlite-sql";
-import {Encrypter} from "@/app/utlities/util";
+import { fetchAll, insertUpdate } from "@/app/utlities/sqlite-sql";
+import { Encrypter } from "@/app/utlities/util";
 
 const encrypter = new Encrypter();
 
@@ -13,7 +13,7 @@ export type SlackCredential = {
     access_token_expiration?: string
 }
 
-export async function insertSlackCredential(credential: SlackCredential){
+export async function insertSlackCredential(credential: SlackCredential) {
     const db = new sqlite3.Database("./credentials.db", sqlite3.OPEN_READWRITE);
     const sql = 'INSERT INTO slack_credentials (id, email, access_token, incoming_webhook) VALUES (?,?,?,?)';
     try {
@@ -25,7 +25,7 @@ export async function insertSlackCredential(credential: SlackCredential){
     }
 }
 
-export async function getSlackCredentialByEmail(email: string){
+export async function getSlackCredentialByEmail(email: string) {
     const db = new sqlite3.Database("./credentials.db", sqlite3.OPEN_READWRITE);
     const sql = `SELECT * FROM slack_credentials WHERE email = '${email}'`;
     let records = [];
@@ -42,7 +42,7 @@ export async function getSlackCredentialByEmail(email: string){
     }
 }
 
-export async function getAllSlackCredentials(){
+export async function getAllSlackCredentials() {
     const db = new sqlite3.Database("./credentials.db", sqlite3.OPEN_READWRITE);
     const sql = `SELECT * FROM slack_credentials`;
     let records = [];

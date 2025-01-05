@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import {getLatestDriveCredential, refreshDriveAccessToken} from "@/app/api/integrations/googledrive/oauth";
-import {getDriveCredentialByEmail} from "@/app/utlities/drive-sqlite-utils";
+import { getLatestDriveCredential } from "@/app/api/integrations/googledrive/oauth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
     const response = await request.json();
-    try{
+    try {
         const driveCreds = await getLatestDriveCredential(response.email);
 
         const headers = new Headers();
@@ -27,24 +26,24 @@ export async function POST(request: NextRequest) {
         const body = await googleResponse.json()
         console.log(body);
 
-        if(googleResponse.status === 200) {
+        if (googleResponse.status === 200) {
             return NextResponse.json(
-                {files: body},
-                {status: 200},
+                { files: body },
+                { status: 200 },
             );
         } else {
             console.error("[Google Drive list files API]", body);
             return NextResponse.json(
-                {error: (body as Error).message},
-                {status: 500},
+                { error: (body as Error).message },
+                { status: 500 },
             );
         }
 
-    }catch(error) {
+    } catch (error) {
         console.error("[Google Drive list files API]", error);
         return NextResponse.json(
-            {error: (error as Error).message},
-            {status: 500},
+            { error: (error as Error).message },
+            { status: 500 },
         );
     }
 }

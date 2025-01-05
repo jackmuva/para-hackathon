@@ -2,7 +2,7 @@ import {
     getDriveCredentialByEmail,
     insertDriveCredential,
     updateDriveCredential
-} from "@/app/utlities/drive-sqlite-utils";
+} from "@/app/utlities/postgres-sql";
 import { uuidv4 } from "uuidv7";
 
 type Credential = {
