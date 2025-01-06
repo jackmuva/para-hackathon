@@ -1,4 +1,4 @@
-import { task, envvars, logger } from "@trigger.dev/sdk/v3";
+import { task, envvars } from "@trigger.dev/sdk/v3";
 
 export const syncSalesforceTask = task({
   id: "Salesforce-Sync-Task",
@@ -15,7 +15,7 @@ export const syncSalesforceTask = task({
 
     let salesforceCreds = await getSalesforceCredentialByEmail(payload.email, pool);
     console.log(salesforceCreds);
-    let contactResponse = await syncContacts(salesforceCreds[0], false, pool);
+    let contactResponse = await syncUpdates(salesforceCreds[0], false, pool);
 
     return contactResponse ? "success" : "[SYNC TASK] Something went wrong with" + payload.instance_url;
   }
@@ -193,17 +193,23 @@ export type SalesforceCredential = {
   token_type?: string
 }
 
-const syncContacts = async (salesforceCreds: any, refresh: boolean, pool: any, nextPage?: string): Promise<boolean> => {
+const syncUpdates = async (salesforceCreds: any, refresh: boolean, pool: any, nextPage?: string): Promise<boolean> => {
   let successful = true;
   const headers = new Headers();
   headers.append("Content-Type", "application/json");
   headers.append("Authorization", "Bearer " + salesforceCreds.access_token);
 
+  const now = new Date();
+  const threeMinAgo = new Date(now);
+  //TODO: replace this with 3 minutes
+  threeMinAgo.setMinutes(now.getMinutes() - (60 * 24));
+
   const params = new URLSearchParams({
-    q: "SELECT FIELDS(STANDARD) from Contact"
+    start: threeMinAgo.toISOString().split(".")[0] + "+00:00",
+    end: now.toISOString().split(".")[0] + "+00:00"
   }).toString();
 
-  let res = await fetch(nextPage ? salesforceCreds.instance_url + nextPage : salesforceCreds.instance_url + "/services/data/v62.0/query?" + params, {
+  let res = await fetch(nextPage ? salesforceCreds.instance_url + nextPage : salesforceCreds.instance_url + "/services/data/v62.0/sobjects/Contact/updated/?" + params, {
     headers: headers
   });
 
@@ -214,24 +220,41 @@ const syncContacts = async (salesforceCreds: any, refresh: boolean, pool: any, n
     const refreshed = await refreshSalesforceToken(salesforceCreds, pool);
     if (refreshed) {
       salesforceCreds = await getSalesforceCredentialByEmail(salesforceCreds.email, pool);
-      successful = await syncContacts(salesforceCreds, true, pool);
+      successful = await syncUpdates(salesforceCreds, true, pool);
     }
   } else if (res.status === 401 && refresh) {
     successful = false;
   } else if (res.status === 200) {
-
     const body = await res.json();
-    for (const contact of body.records) {
-      const res = await insertSalesforceRecord({ id: contact.Id, full_name: contact.Name, title: contact.Title, contact_email: contact.Email, user_email: salesforceCreds.email }, pool);
-      if (!res) console.log("[SALESFORCE SYNC] Could not insert " + contact);
+    for (let id of body.ids) {
+      const queryId = await getContactById(salesforceCreds, id, pool);
+      if (!queryId) console.log("[SALESFORCE CONTACT QUERY] failed to get " + id);
     }
 
-
     if (body.done === false) {
-      syncContacts(salesforceCreds, false, pool, nextPage);
+      syncUpdates(salesforceCreds, false, pool, nextPage);
     }
   }
   return successful;
 }
 
 
+async function getContactById(salesforceCreds: any, id: string, pool: any) {
+  let successful = false;
+  const headers = new Headers();
+  headers.append("Content-Type", "application/json");
+  headers.append("Authorization", "Bearer " + salesforceCreds.access_token);
+
+
+  let res = await fetch(salesforceCreds.instance_url + "/services/data/v62.0/sobjects/Contact/" + id, {
+    headers: headers,
+    method: "GET"
+  });
+
+  if (res.status === 200) {
+    const contact = await res.json();
+    const successfulInsert = await insertSalesforceRecord({ id: contact.Id, full_name: contact.Name, title: contact.Title, contact_email: contact.Email, user_email: salesforceCreds.email }, pool);
+    if (successfulInsert) successful = true;
+  }
+  return successful;
+}
