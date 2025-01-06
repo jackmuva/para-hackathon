@@ -59,7 +59,8 @@ await pgClient.query(`
         email TEXT PRIMARY KEY,
         access_token TEXT,
         refresh_token TEXT,
-        instance_url TEXT
+        instance_url TEXT,
+        sync BOOLEAN
     );
 `);
 

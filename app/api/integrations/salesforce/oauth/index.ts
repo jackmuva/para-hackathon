@@ -56,5 +56,6 @@ export type SalesforceCredential = {
     scope?: string,
     instance_url: string,
     id: string,
+    sync?: boolean,
     token_type?: string
 }

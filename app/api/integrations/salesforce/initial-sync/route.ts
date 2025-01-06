@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSalesforceCredentialByEmail } from "@/app/utlities/postgres-sql";
+import { getSalesforceCredentialByEmail, updateSalesforceCredential } from "@/app/utlities/postgres-sql";
 import { refreshSalesforceToken, SalesforceCredential } from "@/app/api/integrations/salesforce/oauth";
 import { insertSalesforceRecord } from "@/app/utlities/postgres-sql";
 
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 			{ status: 200 }
 		);
 	} catch (error) {
-		console.error("[Salesforce SOQL]", error);
+		console.error("[Salesforce Initial Sync]", error);
 		return NextResponse.json(
 			{ error: (error as Error).message },
 			{ status: 500 },
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
 	}
 }
 
-const syncContacts = async (salesforceCreds: SalesforceCredential, refresh: boolean, nextPage?: string): Promise<boolean> => {
+const syncContacts = async (salesforceCreds: any, refresh: boolean, nextPage?: string): Promise<boolean> => {
 	let successful = true;
 	const headers = new Headers();
 	headers.append("Content-Type", "application/json");
@@ -48,13 +48,13 @@ const syncContacts = async (salesforceCreds: SalesforceCredential, refresh: bool
 	} else if (res.status === 401 && refresh) {
 		successful = false;
 	} else if (res.status === 200) {
-		const body = await res.json();
+		let insertResult = await updateSalesforceCredential({ ...salesforceCreds, sync: true });
+		if (!insertResult) console.log("[SALESFORCE INITIAL SYNC] Unable to update sync flag");
 
+		const body = await res.json();
 		body.records.forEach((contact: any) => {
 			insertSalesforceRecord({ id: contact.Id, full_name: contact.Name, title: contact.Title, contact_email: contact.Email, user_email: salesforceCreds.email });
 		});
-
-		console.log(body);
 		if (body.done === false) {
 			syncContacts(salesforceCreds, false, nextPage);
 		}

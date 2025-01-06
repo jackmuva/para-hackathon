@@ -158,7 +158,7 @@ process.on('SIGTERM', async () => {
 
 export async function insertSalesforceCredential(credential) {
     let written = false;
-    const sql = 'INSERT INTO salesforce_credentials (id, email, access_token, refresh_token, instance_url) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+    const sql = 'INSERT INTO salesforce_credentials (id, email, access_token, refresh_token, instance_url, sync) VALUES ($1, $2, $3, $4, $5, false) RETURNING *';
     try {
         const res = await pool.query(sql, [credential.id, credential.email, encrypter.encrypt(credential.access_token), encrypter.encrypt(credential.refresh_token), credential.instance_url]);
         if (res.rows.length > 0) {
@@ -182,6 +182,7 @@ export async function getSalesforceCredentialByEmail(email) {
             rec.access_token = encrypter.decrypt(record[2]);
             rec.refresh_token = encrypter.decrypt(record[3]);
             rec.instance_url = record[4];
+            rec.sync = record[5];
             result.push(rec);
         });
     } catch (err) {
@@ -202,6 +203,7 @@ export async function getAllSalesforceCredentials() {
             rec.access_token = encrypter.decrypt(record[2]);
             rec.refresh_token = encrypter.decrypt(record[3]);
             rec.instance_url = record[4];
+            rec.sync = record[5];
             result.push(rec);
         });
     } catch (err) {
@@ -212,9 +214,10 @@ export async function getAllSalesforceCredentials() {
 
 export const updateSalesforceCredential = async (credential) => {
     let updated = false;
-    const sql = 'UPDATE salesforce_credentials SET id = $1, email = $2, access_token = $3, refresh_token = $4, instance_url = $5 WHERE email = $6'
+    const sql = 'UPDATE salesforce_credentials SET id = $1, email = $2, access_token = $3, refresh_token = $4, instance_url = $5, sync = $6 WHERE email = $7'
     try {
-        const res = await pool.query(sql, [credential.id, credential.email, encrypter.encrypt(credential.access_token), encrypter.encrypt(credential.refresh_token), credential.instance_url, credential.email]);
+        const res = await pool.query(sql, [credential.id, credential.email, encrypter.encrypt(credential.access_token), encrypter.encrypt(credential.refresh_token),
+        credential.instance_url, credential.sync, credential.email]);
         updated = true;
     } catch (err) {
         console.log(err);
