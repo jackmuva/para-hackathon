@@ -1,7 +1,7 @@
-import { task, envvars, logger } from "@trigger.dev/sdk/v3";
+import { task, envvars } from "@trigger.dev/sdk/v3";
 
 export const syncSalesforceTask = task({
-  id: "Salesforce-Sync-Task",
+  id: "Salesforce-Initial-Sync",
   // Set an optional maxDuration to prevent tasks from running indefinitely
   maxDuration: 1800,
   run: async (payload: any, { ctx }) => {
@@ -17,7 +17,7 @@ export const syncSalesforceTask = task({
     console.log(salesforceCreds);
     let contactResponse = await syncContacts(salesforceCreds[0], false, pool);
 
-    return contactResponse ? "success" : "[SYNC TASK] Something went wrong with" + payload.instance_url;
+    return contactResponse ? "success" : "[SYNC TASK] Something went wrong with" + payload.email;
   }
 });
 import crypto from "crypto";
@@ -219,7 +219,6 @@ const syncContacts = async (salesforceCreds: any, refresh: boolean, pool: any, n
   } else if (res.status === 401 && refresh) {
     successful = false;
   } else if (res.status === 200) {
-
     const body = await res.json();
     for (const contact of body.records) {
       const res = await insertSalesforceRecord({ id: contact.Id, full_name: contact.Name, title: contact.Title, contact_email: contact.Email, user_email: salesforceCreds.email }, pool);

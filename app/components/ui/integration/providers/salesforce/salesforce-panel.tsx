@@ -43,7 +43,7 @@ export const SalesforcePanel = () => {
         headers.append("Content-Type", "application/json");
 
         const session = await getSession();
-        const response = await fetch(getBackendOrigin() + "/api/integrations/salesforce/initial-sync", {
+        const response = await fetch(getBackendOrigin() + "/api/integrations/salesforce/initial-sync-bg", {
             method: "POST",
             headers: headers,
             body: JSON.stringify({ email: session?.user?.email })
