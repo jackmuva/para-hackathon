@@ -15,11 +15,9 @@ export const triggerSalesforceSync = schedules.task({
 		const pool = initializePool(pgUser.value, pgPassword.value, pgHost.value, Number(pgPort.value), pgDatabase.value);
 
 		const instances = await getSalesforceInstances(pool);
-		console.log(instances);
-		instances.forEach((instance: any) => {
-			console.log(instance);
+		for (const instance of instances) {
 			syncSalesforceTask.batchTrigger([{ payload: { email: instance[1], instance_url: instance[4] } }]);
-		});
+		}
 	},
 });
 
