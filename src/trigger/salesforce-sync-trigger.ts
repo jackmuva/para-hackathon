@@ -18,7 +18,7 @@ export const triggerSalesforceSync = schedules.task({
 		console.log(instances);
 		instances.forEach((instance: any) => {
 			console.log(instance);
-			syncSalesforceTask.batchTrigger([{ payload: { email: instance[0].split(",")[1], instance_url: instance[0].split(",")[4] } }]);
+			syncSalesforceTask.batchTrigger([{ payload: { email: instance[1], instance_url: instance[4] } }]);
 		});
 	},
 });
@@ -42,7 +42,7 @@ const initializePool = (pgUser: string, pgPassword: string, pgHost: string, pgPo
 export const getSalesforceInstances = async (pool: any) => {
 	let result = [];
 	try {
-		const text = `SELECT DISTINCT(id, email, access_token, refresh_token, instance_url, sync)
+		const text = `SELECT DISTINCT id, email, access_token, refresh_token, instance_url, sync 
 	FROM public.salesforce_credentials WHERE sync = true;`
 
 		const res = await pool.query({ text: text, rowMode: 'array' });
